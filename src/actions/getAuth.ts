@@ -1,39 +1,39 @@
-import { auth } from "@/lib/auth";
-import type { Session, User } from "next-auth";
-import { redirect } from "next/navigation";
+"use server";
 
-export async function getToken(body: User): Promise<Session> {
-    const res = await fetch(`${process.env.BACKEND_URL}/auth/signup`, {
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { actionClient } from "@/lib/safe-action";
+import { tokenSchema, userSchema } from "@/types/sessionSchema";
+import { fetcher } from "@/utils/fetcher";
+
+export const getToken = actionClient.schema(userSchema).action(async ({ parsedInput }) => {
+    const res = await fetcher(`${process.env.BACKEND_URL}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-        cache: "no-store",
+        data: parsedInput,
+        customConfig: {
+            cache: "no-store",
+        },
+        zodSchema: tokenSchema,
     });
 
-    if (res.status !== 200) {
-        return redirect("/signout");
-    }
+    return res;
+});
 
-    const json = (await res.json()) satisfies Session;
-
-    return json;
-}
-
-export async function getUserInfo(): Promise<Session> {
+export async function getUserInfo() {
     const session = await auth();
     if (!session) return redirect("/login");
 
-    const res = await fetch(`${process.env.BACKEND_URL}/auth/me`, {
+    await fetcher(`${process.env.BACKEND_URL}/auth/me`, {
         method: "GET",
         headers: {
             Authorization: `Bearer ${session?.accessToken}`,
         },
-        next: { tags: ["auth-info"] },
-        cache: "force-cache",
+        customConfig: {
+            next: { tags: ["auth-info"] },
+            cache: "force-cache",
+        },
     });
-    if (res.status === 401) {
-        return redirect("/signout");
-    }
 
     return session;
 }

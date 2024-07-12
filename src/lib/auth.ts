@@ -8,8 +8,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         async signIn({ account, user }) {
             if (account?.provider === "github") {
                 const authInfos = await getToken(user);
-                user.id = authInfos.user.id;
-                user.accessToken = authInfos.accessToken;
+
+                if (!authInfos?.data) return false;
+
+                user.id = authInfos.data.user.id;
+                user.accessToken = authInfos.data.accessToken;
 
                 return true;
             }

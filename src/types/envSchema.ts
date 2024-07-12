@@ -19,9 +19,7 @@ const envServer = envSchema.safeParse({
 });
 
 if (!envServer.success) {
-    console.error(envServer.error.issues);
     throw new Error("There is an error with the server environment variables");
-    process.exit(1);
 }
 
 export const envServerSchema = envServer.data;

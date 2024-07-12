@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import type { Item } from "@/types/itemSchema";
 import type { DraggableSyntheticListeners, UniqueIdentifier } from "@dnd-kit/core";
 import type { Transform } from "@dnd-kit/utilities";
 import { forwardRef } from "react";
@@ -12,12 +13,13 @@ interface Props {
     style?: CSSProperties;
     transform?: Transform | null;
     disabled: boolean;
+    shape: Item["shape"];
     id: UniqueIdentifier;
     isList?: boolean;
 }
 
 export const Draggable = forwardRef<HTMLButtonElement, Props>(function Draggable(
-    { dragging, label, listeners, transform, style, disabled, isList, id, ...props },
+    { dragging, label, listeners, transform, style, disabled, isList, shape, id, ...props },
     ref
 ) {
     return (
@@ -34,7 +36,7 @@ export const Draggable = forwardRef<HTMLButtonElement, Props>(function Draggable
             }
         >
             <button
-                className={`flex size-14 shrink translate-x-[--translate-x] translate-y-[--translate-y] scale-100 transform-gpu appearance-none items-center justify-center rounded-full border-2 border-black bg-white font-bold text-black subpixel-antialiased shadow-sky-300 outline-none transition-shadow fill-mode-forwards ${
+                className={`flex size-14 shrink translate-x-[--translate-x] translate-y-[--translate-y] scale-100 transform-gpu appearance-none items-center justify-center ${shape === "circle" ? "rounded-full" : null} ${shape === "rectangle" ? "w-20" : null} border-2 border-black bg-white font-bold text-black subpixel-antialiased shadow-sky-300 outline-none transition-shadow fill-mode-forwards ${
                     disabled ? "cursor-auto" : "cursor-grab "
                 }  ${dragging && "animate-[pop_250ms_ease-in-out] cursor-grabbing shadow-xl"}`}
                 id={id as string}

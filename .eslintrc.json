@@ -1,3 +1,40 @@
 {
-  "extends": "next/core-web-vitals"
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "root": true,
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:github/recommended",
+        "plugin:unicorn/recommended",
+        "next/core-web-vitals"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module",
+        "project": "tsconfig.json"
+    },
+    "plugins": ["@typescript-eslint", "github", "unicorn"],
+    "rules": {
+        "unicorn/filename-case": "off",
+        "unicorn/prevent-abbreviations": [
+            "error",
+            { "replacements": { "e": false, "res": false, "req": false, "props": false, "env": false } }
+        ],
+        "unicorn/no-await-expression-member": "off",
+        "prettier/prettier": 0,
+        "react/react-in-jsx-scope": "off",
+        "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
+        "filenames/match-regex": 0,
+        "camelcase": 0,
+        "i18n-text/no-en": 0,
+        "eslint-comments/no-use": 0,
+        "unicorn/no-null": 0,
+        "unicorn/no-array-reduce": 0,
+        "react/display-name": 0,
+        "unicorn/no-new-array": 0
+    }
 }

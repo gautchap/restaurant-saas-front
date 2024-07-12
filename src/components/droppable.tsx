@@ -15,9 +15,7 @@ export function Droppable({ id, disabled, children }: DroppableProps) {
     return (
         <div
             ref={setNodeRef}
-            className={`ml-auto mr-8 h-[80dvh] w-[80dvw] border border-black bg-white ${
-                disabled ? "" : " bg-dots-craft bg-[size:40px_40px]"
-            }`}
+            className={`mx-8 h-[80dvh] w-[80dvw] border border-black bg-white ${disabled ? "" : " bg-dots-craft bg-[size:40px_40px]"}`}
         >
             {children}
         </div>

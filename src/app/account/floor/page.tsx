@@ -8,11 +8,10 @@ const DraggableContext = dynamic(
     {
         ssr: false,
         loading: () => (
-            <>
-                <div className="mr-8 h-[80dvh] w-[80dvw] border border-black" />
-
-                <div className="h-screen w-32 bg-orange-400" />
-            </>
+            <div className="flex">
+                <div className="mx-8 h-[80dvh] w-[80dvw] border border-black bg-white" />
+                <div className="flex h-screen w-32 flex-col border-l border-l-primary/10 bg-secondary py-2 shadow-lg" />
+            </div>
         ),
     }
 );

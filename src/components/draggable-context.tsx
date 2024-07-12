@@ -13,6 +13,7 @@ import { deleteItems, updateItems } from "@/actions/items";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { ListItems } from "@/utils/list-items";
 import { Item } from "@/types/itemSchema";
+import { LockToggle } from "@/components/lock-toggle";
 
 interface DraggableContextProps {
     activationConstraint?: PointerActivationConstraint;
@@ -71,11 +72,13 @@ export function DraggableContext({ activationConstraint, defaultItems, session }
             const newItem = {
                 id: window.crypto.randomUUID(),
                 userId: Number(session.user.id),
-                type: ListItem?.type as string,
+                type: ListItem?.type as Item["type"],
+                name: ListItem?.name as string,
                 x: handleX((activatorEvent as MouseEvent).clientX - buttonSize.width / 2, delta.x),
                 y: handleY((activatorEvent as MouseEvent).clientY - buttonSize.height / 2, delta.y),
+                shape: ListItem?.shape as Item["shape"],
                 new: true,
-            };
+            } satisfies Item;
             setUpdatedItems((_items) => [..._items, newItem]);
             return setItems((_items) => [..._items, newItem]);
         }
@@ -117,6 +120,8 @@ export function DraggableContext({ activationConstraint, defaultItems, session }
     };
 
     const handleSave = async () => {
+        // console.log(updatedItems);
+
         if (trash.length > 0) await deleteItems(trash);
         if (!isDisabled && updatedItems.length > 0) {
             await updateItems(updatedItems);
@@ -128,39 +133,49 @@ export function DraggableContext({ activationConstraint, defaultItems, session }
     return (
         <>
             <DndContext sensors={sensors} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
-                <div>
-                    <Droppable id="drop" disabled={isDisabled}>
-                        <div className="box-border flex w-full justify-start p-5">
-                            {items.map((item) => (
-                                <DraggableItem
-                                    key={item.id}
-                                    id={item.id}
-                                    disabled={isDisabled}
-                                    label={item.type as string}
-                                    top={item.y}
-                                    left={item.x}
-                                />
+                <div className="flex">
+                    <div>
+                        <Droppable id="drop" disabled={isDisabled}>
+                            <div className="box-border flex w-full justify-start p-5">
+                                {items.map((item) => (
+                                    <DraggableItem
+                                        key={item.id}
+                                        id={item.id}
+                                        shape={item.shape}
+                                        disabled={isDisabled}
+                                        label={item.name}
+                                        top={item.y}
+                                        left={item.x}
+                                    />
+                                ))}
+                            </div>
+                        </Droppable>
+                        {showTrash ? <TrashDroppable id="trash" /> : null}
+                    </div>
+                    <div className="flex h-screen w-32 flex-col border-l border-l-primary/10 bg-secondary py-2 shadow-lg">
+                        <LockToggle
+                            className="mx-auto"
+                            onClick={() => {
+                                setIsDisabled(!isDisabled);
+                                handleSave();
+                            }}
+                            isDisabled={isDisabled}
+                        />
+
+                        <ul>
+                            {ListItems.map((item) => (
+                                <li key={item.id}>
+                                    <DraggableItem
+                                        shape={item.shape}
+                                        id={item.id}
+                                        isList={true}
+                                        disabled={isDisabled}
+                                        label={item.name}
+                                    />
+                                </li>
                             ))}
-                        </div>
-                    </Droppable>
-                    {showTrash ? <TrashDroppable id="trash" /> : null}
-                </div>
-
-                <div className="h-screen w-32 bg-orange-400">
-                    <input
-                        className="size-9 cursor-pointer"
-                        onChange={handleSave}
-                        type="checkbox"
-                        checked={!isDisabled}
-                    />
-
-                    <ul>
-                        {ListItems.map((item) => (
-                            <li key={item.id}>
-                                <DraggableItem id={item.id} isList={true} disabled={isDisabled} label={item.type} />
-                            </li>
-                        ))}
-                    </ul>
+                        </ul>
+                    </div>{" "}
                 </div>
             </DndContext>
         </>

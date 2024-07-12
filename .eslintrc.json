@@ -22,7 +22,7 @@
         "unicorn/filename-case": "off",
         "unicorn/prevent-abbreviations": [
             "error",
-            { "replacements": { "e": false, "res": false, "req": false, "props": false, "env": false } }
+            { "replacements": { "e": false, "res": false, "req": false, "props": false, "env": false, "ref": false } }
         ],
         "unicorn/no-await-expression-member": "off",
         "prettier/prettier": 0,

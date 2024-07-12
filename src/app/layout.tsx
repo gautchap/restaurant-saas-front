@@ -19,7 +19,7 @@ export default async function RootLayout({
 }>) {
     await auth();
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
             <body className={inter.className}>
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
                     {children}

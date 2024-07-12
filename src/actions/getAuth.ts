@@ -1,3 +1,4 @@
+import { auth } from "@/lib/auth";
 import type { Session, User } from "next-auth";
 import { redirect } from "next/navigation";
 
@@ -13,7 +14,26 @@ export async function getToken(body: User): Promise<Session> {
         return redirect("/signout");
     }
 
-    const json = await res.json();
+    const json = (await res.json()) satisfies Session;
 
     return json;
+}
+
+export async function getUserInfo(): Promise<Session> {
+    const session = await auth();
+    if (!session) return redirect("/login");
+
+    const res = await fetch(`${process.env.BACKEND_URL}/auth/me`, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+        },
+        next: { tags: ["auth-info"] },
+        cache: "force-cache",
+    });
+    if (res.status === 401) {
+        return redirect("/signout");
+    }
+
+    return session;
 }

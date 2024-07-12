@@ -5,6 +5,7 @@
     },
     "root": true,
     "extends": [
+        "plugin:tailwindcss/recommended",
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:github/recommended",

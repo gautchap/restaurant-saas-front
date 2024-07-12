@@ -24,7 +24,7 @@ export const Draggable = forwardRef<HTMLButtonElement, Props>(function Draggable
         <div
             className={`${isList ? "relative" : "absolute"} ${
                 dragging ? "z-10" : "z-auto"
-            } flex items-center flex-col justify-center transition-transform ease-in-out`}
+            } flex flex-col items-center justify-center transition-transform ease-in-out`}
             style={
                 {
                     ...style,
@@ -34,9 +34,9 @@ export const Draggable = forwardRef<HTMLButtonElement, Props>(function Draggable
             }
         >
             <button
-                className={`subpixel-antialiased transform-gpu flex items-center justify-center shrink appearance-none outline-none border-2 border-black bg-white rounded-full shadow-sky-300 fill-mode-forwards transition-shadow translate-x-[--translate-x] translate-y-[--translate-y] scale-100 font-bold size-14 ${
+                className={`flex size-14 shrink translate-x-[--translate-x] translate-y-[--translate-y] scale-100 transform-gpu appearance-none items-center justify-center rounded-full border-2 border-black bg-white font-bold text-black subpixel-antialiased shadow-sky-300 outline-none transition-shadow fill-mode-forwards ${
                     disabled ? "cursor-auto" : "cursor-grab "
-                }  ${dragging && "animate-[pop_250ms_ease-in-out] shadow-xl cursor-grabbing"}`}
+                }  ${dragging && "animate-[pop_250ms_ease-in-out] cursor-grabbing shadow-xl"}`}
                 id={id as string}
                 {...props}
                 aria-label="Draggable"

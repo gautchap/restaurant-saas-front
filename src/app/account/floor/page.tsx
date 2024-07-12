@@ -9,9 +9,9 @@ const DraggableContext = dynamic(
         ssr: false,
         loading: () => (
             <>
-                <div className="mr-8 ml-auto w-[80dvw] h-[80dvh] border border-black" />
+                <div className="mr-8 h-[80dvh] w-[80dvw] border border-black" />
 
-                <div className="w-32 h-screen bg-orange-400" />
+                <div className="h-screen w-32 bg-orange-400" />
             </>
         ),
     }

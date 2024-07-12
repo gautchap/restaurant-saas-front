@@ -12,8 +12,8 @@ export function TrashDroppable({ id }: DroppableProps) {
     return (
         <div
             ref={setNodeRef}
-            className={`animate-in fade-in my-4 mx-auto w-72 h-20 border border-dashed border-black rounded flex justify-center items-center text-lg transition-all ${
-                isOver && "opacity-80 bg-slate-100"
+            className={`mx-auto my-4 flex h-20 w-72 items-center justify-center rounded border border-dashed border-black text-lg transition-all animate-in fade-in ${
+                isOver && "bg-slate-100 opacity-80"
             }`}
         >
             Trash

@@ -130,7 +130,7 @@ export function DraggableContext({ activationConstraint, defaultItems, session }
             <DndContext sensors={sensors} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
                 <div>
                     <Droppable id="drop" disabled={isDisabled}>
-                        <div className="flex w-full box-border p-5 justify-start">
+                        <div className="box-border flex w-full justify-start p-5">
                             {items.map((item) => (
                                 <DraggableItem
                                     key={item.id}
@@ -146,9 +146,9 @@ export function DraggableContext({ activationConstraint, defaultItems, session }
                     {showTrash ? <TrashDroppable id="trash" /> : null}
                 </div>
 
-                <div className="w-32 h-screen bg-orange-400">
+                <div className="h-screen w-32 bg-orange-400">
                     <input
-                        className="cursor-pointer size-9"
+                        className="size-9 cursor-pointer"
                         onChange={handleSave}
                         type="checkbox"
                         checked={!isDisabled}

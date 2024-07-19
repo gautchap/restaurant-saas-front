@@ -22,20 +22,7 @@ interface Props {
 
 export const Draggable = memo(
     forwardRef<HTMLButtonElement, Props>(function Draggable(
-        {
-            dragging,
-            // label,
-            listeners,
-            transform,
-            style,
-            disabled,
-            isList,
-            // shape,
-            tableNumber = 1,
-            chairAmount = 4,
-            id,
-            ...props
-        },
+        { dragging, listeners, transform, style, disabled, isList, tableNumber, chairAmount, id, ...props },
         ref
     ) {
         return (

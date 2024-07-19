@@ -5,21 +5,33 @@ import { Calendar } from "@/components/ui/calendar";
 import { FormEvent, useState } from "react";
 import { fr } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-import { CalendarCheck, LoaderCircle } from "lucide-react";
+import { CalendarCheck, ChevronLeft, CircleX, LoaderCircle, Phone } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { postBooking } from "@/actions/booking";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type BookingProps = {
     id: string;
 };
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function Booking({ id }: BookingProps) {
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [step, setStep] = useState(1);
     const [hour, setHour] = useState<string | null>(null);
     const [done, setDone] = useState(false);
+    const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
-    const hours = ["12:00", "12:30", "13:00"];
+    const [success, setSuccess] = useState(false);
+    const hours = [
+        { hour: "11:00", available: true },
+        { hour: "12:00", available: true },
+        { hour: "13:00", available: false },
+        { hour: "14:00", available: true },
+        { hour: "19:00", available: true },
+        { hour: "20:00", available: true },
+        { hour: "21:00", available: true },
+    ];
 
     const handleSelect: SelectSingleEventHandler = (_date) => {
         setStep((_step) => _step + 1);
@@ -33,6 +45,7 @@ export function Booking({ id }: BookingProps) {
 
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
+
         setLoading(true);
         setDone(true);
         const formData = new FormData(event.target as HTMLFormElement);
@@ -45,47 +58,112 @@ export function Booking({ id }: BookingProps) {
             userId: id,
             date: _date,
             tel: formData.get("tel"),
+            firstName: formData.get("firstName") || undefined,
+            lastName: formData.get("lastName"),
+            email: formData.get("email") || undefined,
+            persons: Number(formData.get("persons")),
+            message: formData.get("message") || undefined,
         };
 
-        await wait(2000);
+        const booking = await postBooking(newBooking);
         setLoading(false);
-        return newBooking;
+        if (booking?.validationErrors) return setError(true);
+
+        if (booking?.data) return setSuccess(true);
     };
 
     return (
         <>
             <div className="relative h-80 w-[250px]">
                 <div className={`transform-gpu overflow-hidden transition-all ${done ? "blur-sm" : null}`}>
-                    <button onClick={() => setStep((_step) => (_step > 1 ? _step - 1 : _step))}>Retour</button>
+                    <Button
+                        variant="ghost"
+                        className="flex"
+                        onClick={() => setStep((_step) => (_step > 1 ? _step - 1 : _step))}
+                    >
+                        <ChevronLeft size={16} strokeWidth={2.25} /> <p>Retour</p>
+                    </Button>
                     <form onSubmit={handleSubmit} className="relative flex h-72 w-[250px] rounded-md border">
                         <Calendar
                             mode="single"
-                            disabled={{ before: new Date() }}
+                            disabled={[
+                                { before: new Date() },
+                                {
+                                    dayOfWeek: [0],
+                                },
+                            ]}
                             locale={fr}
                             selected={date}
                             onSelect={handleSelect}
                             className={`absolute w-[250px] transform-gpu transition-transform duration-300 ${step > 1 ? "-translate-x-64" : "-translate-x-0"}`}
                         />
                         <div
-                            className={`absolute flex h-full w-[250px] transform-gpu flex-col transition-transform duration-300 ${step === 1 && "translate-x-64"} ${step === 2 && "translate-x-0"} ${step === 3 && "-translate-x-64"}`}
+                            className={`absolute flex h-full w-[250px] transform-gpu flex-col p-3 transition-transform duration-300 ${step === 1 && "translate-x-64"} ${step === 2 && "translate-x-0"} ${step === 3 && "-translate-x-64"}`}
                         >
-                            {hours.map((_hour) => (
-                                <Button
-                                    type="button"
-                                    key={_hour}
-                                    className="mx-auto my-3"
-                                    name="time"
-                                    onClick={() => handleHour(_hour)}
-                                    variant="secondary"
-                                >
-                                    {_hour}
-                                </Button>
-                            ))}
+                            <ScrollArea className="h-72">
+                                {hours.map((time) => (
+                                    <Button
+                                        disabled={!time.available}
+                                        type="button"
+                                        key={time.hour}
+                                        className="mx-auto my-1 w-full"
+                                        name="time"
+                                        onClick={() => handleHour(time.hour)}
+                                        variant="secondary"
+                                    >
+                                        {time.hour}
+                                    </Button>
+                                ))}
+                            </ScrollArea>
                         </div>
                         <div
-                            className={`absolute h-full w-[250px] transform-gpu transition-transform duration-300 ${step < 3 ? "translate-x-64" : "-translate-x-0"}`}
+                            className={`absolute h-full w-[250px] transform-gpu space-y-3 p-3 transition-transform duration-300 ${step < 3 ? "translate-x-64" : "-translate-x-0"}`}
                         >
-                            <Input type="tel" name="tel" required />
+                            <div className="flex justify-between gap-2">
+                                <div className="relative w-3/4">
+                                    <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3.5">
+                                        <Phone strokeWidth={2.5} className="size-4 text-gray-500 dark:text-gray-400" />
+                                    </div>
+                                    <Input
+                                        className="p-2.5 ps-8"
+                                        type="tel"
+                                        name="tel"
+                                        pattern="[0-9]{10}"
+                                        placeholder="0787053501"
+                                        required
+                                    />
+                                </div>
+                                <Input
+                                    min="1"
+                                    max="8"
+                                    className="w-1/4"
+                                    type="number"
+                                    name="persons"
+                                    placeholder="1"
+                                    defaultValue="1"
+                                    required
+                                />
+                            </div>
+                            <Input type="text" name="lastName" placeholder="Dupont" required />
+                            <Input
+                                className="absolute size-1 -translate-y-96"
+                                type="text"
+                                name="firstName"
+                                placeholder="Jean"
+                            />
+                            <Input
+                                className="absolute size-1 -translate-y-96"
+                                type="mail"
+                                name="email"
+                                placeholder="test@test.fr"
+                            />
+                            <Textarea
+                                name="message"
+                                autoCorrect="on"
+                                className="resize-none"
+                                placeholder="Si vous voulez nous transmettre un message..."
+                                rows={5}
+                            />
                             <Button type="submit" className="mx-auto my-3" variant="secondary">
                                 Réserver
                             </Button>
@@ -100,14 +178,19 @@ export function Booking({ id }: BookingProps) {
                     <div
                         className={`absolute left-1/2 top-1/2 transform-gpu ${done ? "z-20 opacity-100" : "-z-10 opacity-0"} h-20 w-full -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300`}
                     >
-                        {loading ? (
-                            <LoaderCircle className="mx-auto animate-spin" size={50} />
-                        ) : (
+                        {loading ? <LoaderCircle className="mx-auto animate-spin" size={50} /> : null}
+                        {error ? (
+                            <div className="duration-700 animate-in fade-in">
+                                <CircleX className="mx-auto" size={50} />
+                                <p className="text-center text-sm">Une erreur est survenue</p>
+                            </div>
+                        ) : null}
+                        {success ? (
                             <div className="duration-700 animate-in fade-in">
                                 <CalendarCheck className="mx-auto" size={50} />
                                 <p className="text-center text-sm">Votre réservation a bien été prise en compte</p>
                             </div>
-                        )}
+                        ) : null}
                     </div>
                 </>
             </div>

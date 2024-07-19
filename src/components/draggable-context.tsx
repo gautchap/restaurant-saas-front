@@ -1,19 +1,19 @@
 "use client";
 
+import type { PickOne } from "@/types/typeUtils";
 import type { Session } from "next-auth";
 import type { Coordinates } from "@dnd-kit/utilities";
 import type { DragEndEvent, DragStartEvent, PointerActivationConstraint } from "@dnd-kit/core";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { DndContext, useSensor, MouseSensor, TouchSensor, KeyboardSensor, useSensors } from "@dnd-kit/core";
 import { Droppable } from "@/components/droppable";
-import { DraggableItem } from "@/components/draggable-item";
 import { TrashDroppable } from "@/components/trash-droppable";
 import { deleteItems, updateItems } from "@/actions/items";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { ListItems } from "@/utils/list-items";
 import { Item } from "@/types/itemSchema";
-import { LockToggle } from "@/components/lock-toggle";
+import DragNavbar from "@/components/drag-navbar";
 
 interface DraggableContextProps {
     activationConstraint?: PointerActivationConstraint;
@@ -22,14 +22,11 @@ interface DraggableContextProps {
     session: Session;
 }
 
-export function DraggableContext({ activationConstraint, defaultItems, session }: DraggableContextProps) {
+export const DraggableContext = memo(({ activationConstraint, defaultItems, session }: DraggableContextProps) => {
     const [items, setItems] = useState(defaultItems);
-
     const [updatedItems, setUpdatedItems] = useState<Item[]>([]);
     const [trash, setTrash] = useState<Item[]>([]);
-
     const [showTrash, setShowTrash] = useState(false);
-
     const [isDisabled, setIsDisabled] = useLocalStorage("isEdit", false);
 
     const mouseSensor = useSensor(MouseSensor, {
@@ -71,41 +68,39 @@ export function DraggableContext({ activationConstraint, defaultItems, session }
 
             const newItem = {
                 id: window.crypto.randomUUID(),
-                userId: Number(session.user.id),
+                userId: session.user.id as string,
                 type: ListItem?.type as Item["type"],
                 name: ListItem?.name as string,
                 x: handleX((activatorEvent as MouseEvent).clientX - buttonSize.width / 2, delta.x),
                 y: handleY((activatorEvent as MouseEvent).clientY - buttonSize.height / 2, delta.y),
                 shape: ListItem?.shape as Item["shape"],
                 new: true,
+                tableNumber: Math.floor(Math.random() * (100 - 1 + 1) + 1),
+                chairAmount: 4,
             } satisfies Item;
             setUpdatedItems((_items) => [..._items, newItem]);
             return setItems((_items) => [..._items, newItem]);
         }
 
         if (over.id === "drop") {
-            const update = items.map((item) => {
-                if (item.id === active.id) {
-                    const updateItem = {
-                        ...item,
-                        x: handleX(item.x, delta.x),
-                        y: handleY(item.y, delta.y),
-                    };
-                    const itemExist = updatedItems.find((_item) => _item.id === active.id);
-                    if (itemExist) {
-                        setUpdatedItems((_items) =>
-                            _items.map((_item) => (_item.id === active.id ? updateItem : _item))
-                        );
-                    } else {
-                        setUpdatedItems((_items) => [..._items, updateItem]);
-                    }
-                    return updateItem;
+            const itemExist = items.find((item) => item.id === active.id);
+            const updatedItemExist = updatedItems.find((item) => item.id === active.id);
+
+            if (itemExist) {
+                const updateItem = {
+                    ...itemExist,
+                    x: handleX(itemExist.x, delta.x),
+                    y: handleY(itemExist.y, delta.y),
+                };
+
+                setItems((_items) => _items.map((_item) => (_item.id === active.id ? updateItem : _item)));
+
+                if (updatedItemExist) {
+                    setUpdatedItems((_items) => _items.map((_item) => (_item.id === active.id ? updateItem : _item)));
+                } else {
+                    setUpdatedItems((_items) => [..._items, updateItem]);
                 }
-
-                return item;
-            });
-
-            return setItems(() => update);
+            }
         }
 
         if (over.id === "trash") {
@@ -120,14 +115,33 @@ export function DraggableContext({ activationConstraint, defaultItems, session }
     };
 
     const handleSave = async () => {
-        // console.log(updatedItems);
-
+        setIsDisabled((disable) => !disable);
         if (trash.length > 0) await deleteItems(trash);
         if (!isDisabled && updatedItems.length > 0) {
             await updateItems(updatedItems);
             setUpdatedItems([]);
         }
-        return setIsDisabled(!isDisabled);
+    };
+
+    const handleAmount = ({ id, tableNumber, chairAmount }: PickOne<Item, "id">) => {
+        const itemExist = items.find((item) => item.id === id);
+        const updatedItemExist = updatedItems.find((item) => item.id === id);
+
+        if (itemExist) {
+            const updateItem = {
+                ...itemExist,
+                tableNumber: tableNumber || itemExist.tableNumber,
+                chairAmount: chairAmount || itemExist.chairAmount,
+            };
+
+            setItems((_items) => _items.map((_item) => (_item.id === id ? updateItem : _item)));
+
+            if (updatedItemExist) {
+                setUpdatedItems((_items) => _items.map((_item) => (_item.id === id ? updateItem : _item)));
+            } else {
+                setUpdatedItems((_items) => [..._items, updateItem]);
+            }
+        }
     };
 
     return (
@@ -135,49 +149,12 @@ export function DraggableContext({ activationConstraint, defaultItems, session }
             <DndContext sensors={sensors} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
                 <div className="flex">
                     <div>
-                        <Droppable id="drop" disabled={isDisabled}>
-                            <div className="box-border flex w-full justify-start p-5">
-                                {items.map((item) => (
-                                    <DraggableItem
-                                        key={item.id}
-                                        id={item.id}
-                                        shape={item.shape}
-                                        disabled={isDisabled}
-                                        label={item.name}
-                                        top={item.y}
-                                        left={item.x}
-                                    />
-                                ))}
-                            </div>
-                        </Droppable>
+                        <Droppable handleAmount={handleAmount} droppableId="drop" disabled={isDisabled} items={items} />
                         {showTrash ? <TrashDroppable id="trash" /> : null}
                     </div>
-                    <div className="flex h-screen w-32 flex-col border-l border-l-primary/10 bg-secondary py-2 shadow-lg">
-                        <LockToggle
-                            className="mx-auto"
-                            onClick={() => {
-                                setIsDisabled(!isDisabled);
-                                handleSave();
-                            }}
-                            isDisabled={isDisabled}
-                        />
-
-                        <ul>
-                            {ListItems.map((item) => (
-                                <li key={item.id}>
-                                    <DraggableItem
-                                        shape={item.shape}
-                                        id={item.id}
-                                        isList={true}
-                                        disabled={isDisabled}
-                                        label={item.name}
-                                    />
-                                </li>
-                            ))}
-                        </ul>
-                    </div>{" "}
+                    <DragNavbar handleSave={handleSave} isDisabled={isDisabled} />
                 </div>
             </DndContext>
         </>
     );
-}
+});

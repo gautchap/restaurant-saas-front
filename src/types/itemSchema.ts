@@ -9,8 +9,8 @@ export const itemSchema = z.object({
     y: z.number(),
     shape: z.enum(["rectangle", "circle", "multi"]),
     new: z.boolean().optional(),
-    tableNumber: z.number().optional(),
-    chairAmount: z.number().optional(),
+    tableNumber: z.number(),
+    chairPos: z.array(z.number()),
 });
 
 export type Item = z.infer<typeof itemSchema>;

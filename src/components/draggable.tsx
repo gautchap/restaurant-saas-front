@@ -5,6 +5,7 @@ import type { Item } from "@/types/itemSchema";
 import type { DraggableSyntheticListeners, UniqueIdentifier } from "@dnd-kit/core";
 import type { Transform } from "@dnd-kit/utilities";
 import { forwardRef, memo } from "react";
+import { ChairPositionFloor } from "@/components/chair-position-floor";
 
 interface Props {
     dragging?: boolean;
@@ -16,15 +17,18 @@ interface Props {
     shape: Item["shape"];
     id: UniqueIdentifier;
     isList?: boolean;
-    tableNumber?: number;
-    chairAmount?: number;
+    tableNumber: Item["tableNumber"];
+    chairPos: Item["chairPos"];
 }
 
 export const Draggable = memo(
     forwardRef<HTMLButtonElement, Props>(function Draggable(
-        { dragging, listeners, transform, style, disabled, isList, tableNumber, chairAmount, id, ...props },
+        { dragging, listeners, transform, style, disabled, isList, shape, tableNumber, id, chairPos, ...props },
         ref
     ) {
+        const horizChairs = Boolean(chairPos.some((pos) => pos === 2 || pos === 3));
+        const vertiChairs = Boolean(chairPos.some((pos) => pos === 1 || pos === 4));
+
         return (
             <div
                 className={`${isList ? "relative" : "absolute"} ${
@@ -39,7 +43,7 @@ export const Draggable = memo(
                 }
             >
                 <button
-                    className={`flex size-24 shrink translate-x-[--translate-x] translate-y-[--translate-y] scale-100 transform-gpu appearance-none items-center justify-center font-bold text-black subpixel-antialiased  outline-none transition-shadow fill-mode-forwards ${
+                    className={`flex ${horizChairs ? "w-24" : "w-12"} ${vertiChairs ? "h-24" : "h-12"}  shrink translate-x-[--translate-x] translate-y-[--translate-y] scale-100 transform-gpu appearance-none items-center justify-center font-bold text-black subpixel-antialiased  outline-none transition-shadow fill-mode-forwards ${
                         disabled ? "cursor-auto" : "cursor-grab "
                     }  ${dragging && "group animate-[pop_200ms_ease-in-out] cursor-grabbing"}`}
                     id={id as string}
@@ -53,28 +57,12 @@ export const Draggable = memo(
                         <p className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 transform-gpu">
                             {tableNumber}
                         </p>
-                        <div className="size-12 rounded border-2 border-black bg-white transition-shadow group-active:shadow-lg" />
-                        {Number(chairAmount) >= 1 ? (
-                            <div className="absolute -top-1/2 left-1/2 size-5 -translate-x-1/2 transform-gpu rounded-b-lg border-2 border-black bg-white transition-shadow group-active:shadow-lg">
-                                <div className="mt-px border border-black" />
-                            </div>
-                        ) : null}
-
-                        {Number(chairAmount) >= 2 ? (
-                            <div className="absolute -left-1/2 top-1/2 size-5 -translate-y-1/2 -rotate-90 transform-gpu rounded-b-lg border-2 border-black bg-white transition-shadow group-active:shadow-lg">
-                                <div className="mt-px border border-black" />
-                            </div>
-                        ) : null}
-                        {Number(chairAmount) >= 3 ? (
-                            <div className="absolute -right-1/2 top-1/2 size-5 -translate-y-1/2 rotate-90 transform-gpu rounded-b-lg border-2 border-black bg-white transition-shadow group-active:shadow-lg">
-                                <div className="mt-px border border-black" />
-                            </div>
-                        ) : null}
-                        {Number(chairAmount) >= 4 ? (
-                            <div className="absolute -bottom-1/2 left-1/2 size-5 -translate-x-1/2 rotate-180 transform-gpu rounded-b-lg border-2 border-black bg-white transition-shadow group-active:shadow-lg">
-                                <div className="mt-px border border-black" />
-                            </div>
-                        ) : null}
+                        <div
+                            className={`size-12 ${shape === "circle" ? "rounded-full" : null} ${shape === "rectangle" ? "rounded" : null} border-2 border-black bg-white transition-shadow group-active:shadow-2xl`}
+                        />
+                        {chairPos.map((pos) => (
+                            <ChairPositionFloor key={pos} num={pos} />
+                        ))}
                     </div>
                 </button>
             </div>

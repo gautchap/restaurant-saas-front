@@ -5,19 +5,28 @@ import { DraggableItem } from "@/components/draggable-item";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ChairPositionMenu } from "@/components/chair-position-menu";
 
 type DroppableProps = {
     droppableId: string;
     disabled: boolean;
     items: Item[];
     // eslint-disable-next-line no-unused-vars
-    handleAmount: ({ id, tableNumber, chairAmount }: PickOne<Item, "id">) => void;
+    editChairPos: (id: string, checked: boolean, chairId: number) => void;
+    // eslint-disable-next-line no-unused-vars
+    handleAmount: ({ id, tableNumber }: PickOne<Item, "id">) => void;
 };
 
-export function Droppable({ droppableId, disabled, items, handleAmount }: DroppableProps) {
+const checkboxList = [1, 2, 3, 4];
+
+export function Droppable({ droppableId, disabled, items, handleAmount, editChairPos }: DroppableProps) {
     const { setNodeRef } = useDroppable({
         id: droppableId,
     });
+
+    const handleCkeck = (itemId: string, checked: boolean, checkId: number) => {
+        editChairPos(itemId, checked, checkId);
+    };
 
     return (
         <div
@@ -30,7 +39,7 @@ export function Droppable({ droppableId, disabled, items, handleAmount }: Droppa
                         <ContextMenuTrigger disabled={disabled}>
                             <DraggableItem
                                 tableNumber={item.tableNumber}
-                                chairAmount={item.chairAmount}
+                                chairPos={item.chairPos}
                                 key={item.id}
                                 id={item.id}
                                 shape={item.shape}
@@ -68,22 +77,20 @@ export function Droppable({ droppableId, disabled, items, handleAmount }: Droppa
                                         />
                                     </div>
                                     <div className="grid grid-cols-3 items-center gap-4">
-                                        <Label htmlFor="chairAmount">Nb. de chaises</Label>
-                                        <Input
-                                            id="chairAmount"
-                                            min="1"
-                                            max="4"
-                                            onChange={(e) =>
-                                                handleAmount({
-                                                    id: item.id,
-                                                    chairAmount:
-                                                        Number(e.target.value) >= 4 ? 4 : Number(e.target.value),
-                                                })
-                                            }
-                                            type="number"
-                                            value={item.chairAmount}
-                                            className="col-span-2 h-8"
-                                        />
+                                        <Label htmlFor="chairPos">Position des chaises</Label>
+                                        <div className="relative h-7 w-8">
+                                            {checkboxList.map((_id) => (
+                                                <ChairPositionMenu
+                                                    key={_id}
+                                                    pos={_id}
+                                                    itemId={item.id}
+                                                    checked={
+                                                        item.chairPos ? Boolean(item.chairPos?.includes(_id)) : false
+                                                    }
+                                                    handleCkeck={handleCkeck}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

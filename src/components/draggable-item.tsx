@@ -14,21 +14,20 @@ interface DraggableItemProps {
     id: UniqueIdentifier;
     isList?: boolean;
     shape: Item["shape"];
-    tableNumber?: number;
-    chairAmount?: number;
+    tableNumber: Item["tableNumber"];
+    chairPos: Item["chairPos"];
 }
 
 export const DraggableItem = memo(
-    ({ label, top, left, disabled, id, isList, shape, tableNumber, chairAmount }: DraggableItemProps) => {
+    ({ label, top, left, disabled, id, isList, shape, tableNumber, chairPos }: DraggableItemProps) => {
         const { attributes, isDragging, listeners, setNodeRef, transform } = useDraggable({
             id,
             disabled,
         });
-
         return (
             <Draggable
                 tableNumber={tableNumber}
-                chairAmount={chairAmount}
+                chairPos={chairPos}
                 id={id}
                 isList={isList}
                 disabled={disabled}

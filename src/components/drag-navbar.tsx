@@ -15,6 +15,8 @@ export default function DragNavbar({ handleSave, isDisabled }: DragNavbarProps) 
                 {ListItems.map((item) => (
                     <li key={item.id}>
                         <DraggableItem
+                            tableNumber={99}
+                            chairPos={item.chairPos}
                             shape={item.shape}
                             id={item.id}
                             isList={true}

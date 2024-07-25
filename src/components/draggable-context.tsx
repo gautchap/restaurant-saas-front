@@ -43,24 +43,49 @@ export const DraggableContext = memo(({ activationConstraint, defaultItems, sess
         if (!over) return;
 
         const buttonSize = {
-            width: (activatorEvent.target as HTMLElement).offsetWidth || 0,
-            height: (activatorEvent.target as HTMLElement).offsetHeight || 0,
+            width:
+                (activatorEvent.target as HTMLElement).offsetWidth < 96
+                    ? 96
+                    : (activatorEvent.target as HTMLElement).offsetWidth,
+            height:
+                (activatorEvent.target as HTMLElement).offsetHeight < 96
+                    ? 96
+                    : (activatorEvent.target as HTMLElement).offsetHeight,
         };
 
-        const handleX = (x: number, _delta: number) => {
-            let result = x + _delta;
-            if (x + _delta > over.rect.right - buttonSize.width) result = over.rect.right - buttonSize.width;
-            if (x + _delta < over.rect.left) result = over.rect.left;
+        const handleAxis = (x: number, deltaX: number, y: number, deltaY: number) => {
+            let posX = x + deltaX;
+            let posY = y + deltaY;
+            if (posX > over.rect.right - buttonSize.width) {
+                posX = over.rect.right - buttonSize.width;
+                return { x: posX, y };
+            }
+            if (posX < over.rect.left) {
+                posX = over.rect.left;
+                return { x: posX, y };
+            }
+            if (posY > over.rect.bottom - buttonSize.height) {
+                posY = over.rect.bottom - buttonSize.height;
+                return { x, y: posY };
+            }
+            if (posY < over.rect.top) {
+                posY = over.rect.top;
+                return { x, y: posY };
+            }
 
-            return Number(result.toFixed(0));
-        };
-
-        const handleY = (y: number, _delta: number) => {
-            let result = y + _delta;
-            if (y + _delta > over.rect.bottom - buttonSize.height) result = over.rect.bottom - buttonSize.height;
-            if (y + _delta < over.rect.top) result = over.rect.top;
-
-            return Number(result.toFixed(0));
+            for (const item of items) {
+                if (
+                    item.id !== active.id &&
+                    posX < item.x + buttonSize.width &&
+                    posX + buttonSize.width > item.x &&
+                    posY < item.y + buttonSize.height &&
+                    posY + buttonSize.height > item.y
+                ) {
+                    posX = x;
+                    posY = y;
+                }
+            }
+            return { x: posX, y: posY };
         };
 
         if (Boolean(ListItems.some((item) => item.id === active.id)) && over.id === "drop") {
@@ -71,12 +96,22 @@ export const DraggableContext = memo(({ activationConstraint, defaultItems, sess
                 userId: session.user.id as string,
                 type: ListItem?.type as Item["type"],
                 name: ListItem?.name as string,
-                x: handleX((activatorEvent as MouseEvent).clientX - buttonSize.width / 2, delta.x),
-                y: handleY((activatorEvent as MouseEvent).clientY - buttonSize.height / 2, delta.y),
+                x: handleAxis(
+                    (activatorEvent as MouseEvent).clientX - buttonSize.width / 2,
+                    delta.x,
+                    (activatorEvent as MouseEvent).clientY - buttonSize.height / 2,
+                    delta.y
+                ).x,
+                y: handleAxis(
+                    (activatorEvent as MouseEvent).clientX - buttonSize.width / 2,
+                    delta.x,
+                    (activatorEvent as MouseEvent).clientY - buttonSize.height / 2,
+                    delta.y
+                ).y,
                 shape: ListItem?.shape as Item["shape"],
                 new: true,
                 tableNumber: Math.floor(Math.random() * (100 - 1 + 1) + 1),
-                chairAmount: 4,
+                chairPos: [1, 2, 3, 4],
             } satisfies Item;
             setUpdatedItems((_items) => [..._items, newItem]);
             return setItems((_items) => [..._items, newItem]);
@@ -89,8 +124,8 @@ export const DraggableContext = memo(({ activationConstraint, defaultItems, sess
             if (itemExist) {
                 const updateItem = {
                     ...itemExist,
-                    x: handleX(itemExist.x, delta.x),
-                    y: handleY(itemExist.y, delta.y),
+                    x: handleAxis(itemExist.x, delta.x, itemExist.y, delta.y).x,
+                    y: handleAxis(itemExist.x, delta.x, itemExist.y, delta.y).y,
                 };
 
                 setItems((_items) => _items.map((_item) => (_item.id === active.id ? updateItem : _item)));
@@ -123,7 +158,27 @@ export const DraggableContext = memo(({ activationConstraint, defaultItems, sess
         }
     };
 
-    const handleAmount = ({ id, tableNumber, chairAmount }: PickOne<Item, "id">) => {
+    const editChairPos = (id: string, checked: boolean, chairId: number) => {
+        const itemExist = items.find((item) => item.id === id);
+        const updatedItemExist = updatedItems.find((item) => item.id === id);
+        if (itemExist) {
+            if (checked) {
+                itemExist?.chairPos?.push(chairId);
+            } else {
+                itemExist?.chairPos?.splice(itemExist?.chairPos?.indexOf(chairId), 1);
+            }
+
+            setItems((_items) => _items.map((_item) => (_item.id === id ? itemExist : _item)));
+
+            if (updatedItemExist) {
+                setUpdatedItems((_items) => _items.map((_item) => (_item.id === id ? itemExist : _item)));
+            } else {
+                setUpdatedItems((_items) => [..._items, itemExist]);
+            }
+        }
+    };
+
+    const handleAmount = ({ id, tableNumber }: PickOne<Item, "id">) => {
         const itemExist = items.find((item) => item.id === id);
         const updatedItemExist = updatedItems.find((item) => item.id === id);
 
@@ -131,7 +186,6 @@ export const DraggableContext = memo(({ activationConstraint, defaultItems, sess
             const updateItem = {
                 ...itemExist,
                 tableNumber: tableNumber || itemExist.tableNumber,
-                chairAmount: chairAmount || itemExist.chairAmount,
             };
 
             setItems((_items) => _items.map((_item) => (_item.id === id ? updateItem : _item)));
@@ -149,7 +203,13 @@ export const DraggableContext = memo(({ activationConstraint, defaultItems, sess
             <DndContext sensors={sensors} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
                 <div className="flex">
                     <div>
-                        <Droppable handleAmount={handleAmount} droppableId="drop" disabled={isDisabled} items={items} />
+                        <Droppable
+                            editChairPos={editChairPos}
+                            handleAmount={handleAmount}
+                            droppableId="drop"
+                            disabled={isDisabled}
+                            items={items}
+                        />
                         {showTrash ? <TrashDroppable id="trash" /> : null}
                     </div>
                     <DragNavbar handleSave={handleSave} isDisabled={isDisabled} />

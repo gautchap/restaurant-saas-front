@@ -6,6 +6,7 @@ const envSchema = z.object({
     BACKEND_URL: z.string().trim().min(1).url(),
     AUTH_URL: z.string().trim().min(1).url(),
     AUTH_SECRET: z.string().trim().min(1),
+    NEXT_PUBLIC_URL: z.string().trim().min(1),
     PORT: z.number().default(3000),
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });
@@ -16,6 +17,7 @@ const envServer = envSchema.safeParse({
     BACKEND_URL: process.env.BACKEND_URL,
     AUTH_URL: process.env.AUTH_URL,
     AUTH_SECRET: process.env.AUTH_SECRET,
+    NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
     PORT: process.env.PORT,
     NODE_ENV: process.env.NODE_ENV,
 });

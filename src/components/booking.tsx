@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { FormEvent, useState } from "react";
 import { fr } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-import { CalendarCheck, ChevronLeft, CircleX, LoaderCircle, Phone } from "lucide-react";
+import { CalendarCheck, ChevronLeft, CircleX, LoaderCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { postBooking } from "@/actions/booking";
@@ -35,6 +35,7 @@ export function Booking({ id }: BookingProps) {
 
     const handleSelect: SelectSingleEventHandler = (_date) => {
         setStep((_step) => _step + 1);
+        if (!_date) return;
         setDate(_date);
     };
 
@@ -57,7 +58,7 @@ export function Booking({ id }: BookingProps) {
         const newBooking = {
             userId: id,
             date: _date,
-            tel: formData.get("tel"),
+            tel: formData.get("tel") || undefined,
             firstName: formData.get("firstName") || undefined,
             lastName: formData.get("lastName"),
             email: formData.get("email") || undefined,
@@ -66,15 +67,17 @@ export function Booking({ id }: BookingProps) {
         };
 
         const booking = await postBooking(newBooking);
+
         setLoading(false);
-        if (booking?.validationErrors) return setError(true);
+
+        if (!booking?.data) return setError(true);
 
         if (booking?.data) return setSuccess(true);
     };
 
     return (
         <>
-            <div className="relative h-80 w-[250px]">
+            <div className="relative size-80">
                 <div className={`transform-gpu overflow-hidden transition-all ${done ? "blur-sm" : null}`}>
                     <Button
                         variant="ghost"
@@ -83,7 +86,7 @@ export function Booking({ id }: BookingProps) {
                     >
                         <ChevronLeft size={16} strokeWidth={2.25} /> <p>Retour</p>
                     </Button>
-                    <form onSubmit={handleSubmit} className="relative flex h-72 w-[250px] rounded-md border">
+                    <form onSubmit={handleSubmit} className="relative flex h-72 w-80 justify-center rounded-md border">
                         <Calendar
                             mode="single"
                             disabled={[
@@ -95,10 +98,10 @@ export function Booking({ id }: BookingProps) {
                             locale={fr}
                             selected={date}
                             onSelect={handleSelect}
-                            className={`absolute w-[250px] transform-gpu transition-transform duration-300 ${step > 1 ? "-translate-x-64" : "-translate-x-0"}`}
+                            className={`absolute w-80 transform-gpu p-5 pb-6 transition-transform duration-300 ${step > 1 ? "-translate-x-80" : "-translate-x-0"}`}
                         />
                         <div
-                            className={`absolute flex h-full w-[250px] transform-gpu flex-col p-3 transition-transform duration-300 ${step === 1 && "translate-x-64"} ${step === 2 && "translate-x-0"} ${step === 3 && "-translate-x-64"}`}
+                            className={`absolute flex h-full w-80 transform-gpu flex-col p-3 transition-transform duration-300 ${step === 1 && "translate-x-80"} ${step === 2 && "translate-x-0"} ${step === 3 && "-translate-x-80"}`}
                         >
                             <ScrollArea className="h-72">
                                 {hours.map((time) => (
@@ -117,22 +120,10 @@ export function Booking({ id }: BookingProps) {
                             </ScrollArea>
                         </div>
                         <div
-                            className={`absolute h-full w-[250px] transform-gpu space-y-3 p-3 transition-transform duration-300 ${step < 3 ? "translate-x-64" : "-translate-x-0"}`}
+                            className={`absolute h-full w-80 transform-gpu space-y-3 p-3 transition-transform duration-300 ${step < 3 ? "translate-x-80" : "-translate-x-0"}`}
                         >
                             <div className="flex justify-between gap-2">
-                                <div className="relative w-3/4">
-                                    <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3.5">
-                                        <Phone strokeWidth={2.5} className="size-4 text-gray-500 dark:text-gray-400" />
-                                    </div>
-                                    <Input
-                                        className="p-2.5 ps-8"
-                                        type="tel"
-                                        name="tel"
-                                        pattern="[0-9]{10}"
-                                        placeholder="0787053501"
-                                        required
-                                    />
-                                </div>
+                                <Input className="p-2.5" type="mail" name="email" placeholder="test@test.fr" required />
                                 <Input
                                     min="1"
                                     max="8"
@@ -151,11 +142,13 @@ export function Booking({ id }: BookingProps) {
                                 name="firstName"
                                 placeholder="Jean"
                             />
+
                             <Input
                                 className="absolute size-1 -translate-y-96"
-                                type="mail"
-                                name="email"
-                                placeholder="test@test.fr"
+                                type="tel"
+                                name="tel"
+                                pattern="[0-9]{10}"
+                                placeholder="0787053501"
                             />
                             <Textarea
                                 name="message"
@@ -180,9 +173,18 @@ export function Booking({ id }: BookingProps) {
                     >
                         {loading ? <LoaderCircle className="mx-auto animate-spin" size={50} /> : null}
                         {error ? (
-                            <div className="duration-700 animate-in fade-in">
+                            <div className="flex flex-col items-center duration-700 animate-in fade-in">
                                 <CircleX className="mx-auto" size={50} />
                                 <p className="text-center text-sm">Une erreur est survenue</p>
+                                <Button
+                                    variant="link"
+                                    onClick={() => {
+                                        setError(false);
+                                        setDone(false);
+                                    }}
+                                >
+                                    réessayer
+                                </Button>
                             </div>
                         ) : null}
                         {success ? (

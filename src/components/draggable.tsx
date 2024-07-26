@@ -26,8 +26,9 @@ export const Draggable = memo(
         { dragging, listeners, transform, style, disabled, isList, shape, tableNumber, id, chairPos, ...props },
         ref
     ) {
-        const horizChairs = Boolean(chairPos.some((pos) => pos === 2 || pos === 3));
-        const vertiChairs = Boolean(chairPos.some((pos) => pos === 1 || pos === 4));
+        const horizChairs = chairPos.some((pos) => pos === 2 || pos === 3);
+
+        const vertiChairs = chairPos.some((pos) => pos === 1 || pos === 4);
 
         return (
             <div

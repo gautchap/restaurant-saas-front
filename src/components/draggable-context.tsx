@@ -43,14 +43,8 @@ export const DraggableContext = memo(({ activationConstraint, defaultItems, sess
         if (!over) return;
 
         const buttonSize = {
-            width:
-                (activatorEvent.target as HTMLElement).offsetWidth < 96
-                    ? 96
-                    : (activatorEvent.target as HTMLElement).offsetWidth,
-            height:
-                (activatorEvent.target as HTMLElement).offsetHeight < 96
-                    ? 96
-                    : (activatorEvent.target as HTMLElement).offsetHeight,
+            width: (activatorEvent.target as HTMLElement).offsetWidth,
+            height: (activatorEvent.target as HTMLElement).offsetHeight,
         };
 
         const handleAxis = (x: number, deltaX: number, y: number, deltaY: number) => {
@@ -74,12 +68,17 @@ export const DraggableContext = memo(({ activationConstraint, defaultItems, sess
             }
 
             for (const item of items) {
+                const horizChairs = Boolean(item.chairPos.some((pos) => pos === 2 || pos === 3));
+                const vertiChairs = Boolean(item.chairPos.some((pos) => pos === 1 || pos === 4));
+                const width = horizChairs ? 96 : 48;
+                const height = vertiChairs ? 96 : 48;
+
                 if (
                     item.id !== active.id &&
-                    posX < item.x + buttonSize.width &&
-                    posX + buttonSize.width > item.x &&
-                    posY < item.y + buttonSize.height &&
-                    posY + buttonSize.height > item.y
+                    posX < item.x + width &&
+                    item.x < posX + buttonSize.width &&
+                    posY < item.y + height &&
+                    item.y < posY + buttonSize.height
                 ) {
                     posX = x;
                     posY = y;

@@ -1,14 +1,20 @@
+"use client";
+
+import { useCustomDraggable } from "@/context/draggable-provider";
 import { useDroppable } from "@dnd-kit/core";
 import { Trash2 } from "lucide-react";
+import { memo } from "react";
 
 type DroppableProps = {
     id: string;
 };
 
-export function TrashDroppable({ id }: DroppableProps) {
+export const TrashDroppable = memo(({ id }: DroppableProps) => {
     const { isOver, setNodeRef } = useDroppable({
         id,
     });
+    const { showTrash } = useCustomDraggable();
+    if (!showTrash) return null;
 
     return (
         <div
@@ -20,4 +26,4 @@ export function TrashDroppable({ id }: DroppableProps) {
             <Trash2 />
         </div>
     );
-}
+});

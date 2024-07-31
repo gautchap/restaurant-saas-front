@@ -2,7 +2,7 @@
 
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import type { Item } from "@/types/itemSchema";
-import { Draggable } from "@/components/draggable";
+import { Draggable } from "@/components/dnd-floor/draggable";
 import { useDraggable } from "@dnd-kit/core";
 import { memo } from "react";
 

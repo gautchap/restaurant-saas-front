@@ -5,7 +5,7 @@ import type { Item } from "@/types/itemSchema";
 import type { DraggableSyntheticListeners, UniqueIdentifier } from "@dnd-kit/core";
 import type { Transform } from "@dnd-kit/utilities";
 import { forwardRef, memo } from "react";
-import { ChairPositionFloor } from "@/components/chair-position-floor";
+import { ChairPositionFloor } from "@/components/dnd-floor/chair-position-floor";
 
 interface Props {
     dragging?: boolean;

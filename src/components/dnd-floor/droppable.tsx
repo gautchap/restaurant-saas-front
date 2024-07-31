@@ -1,25 +1,22 @@
-import type { PickOne } from "@/types/typeUtils";
+"use client";
+
 import { useDroppable } from "@dnd-kit/core";
-import { Item } from "@/types/itemSchema";
-import { DraggableItem } from "@/components/draggable-item";
+import { DraggableItem } from "@/components/dnd-floor/draggable-item";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChairPositionMenu } from "@/components/chair-position-menu";
+import { ChairPositionMenu } from "@/components/dnd-floor/chair-position-menu";
+import { useCustomDraggable } from "@/context/draggable-provider";
+import { memo } from "react";
 
 type DroppableProps = {
     droppableId: string;
-    disabled: boolean;
-    items: Item[];
-    // eslint-disable-next-line no-unused-vars
-    editChairPos: (id: string, checked: boolean, chairId: number) => void;
-    // eslint-disable-next-line no-unused-vars
-    handleAmount: ({ id, tableNumber }: PickOne<Item, "id">) => void;
 };
 
 const checkboxList = [1, 2, 3, 4];
 
-export function Droppable({ droppableId, disabled, items, handleAmount, editChairPos }: DroppableProps) {
+export const Droppable = memo(({ droppableId }: DroppableProps) => {
+    const { isDisabled, items, handleAmount, editChairPos } = useCustomDraggable();
     const { setNodeRef } = useDroppable({
         id: droppableId,
     });
@@ -31,19 +28,19 @@ export function Droppable({ droppableId, disabled, items, handleAmount, editChai
     return (
         <div
             ref={setNodeRef}
-            className={`mx-8 h-[80dvh] w-[80dvw] border border-black bg-white ${disabled ? "" : " bg-dots-craft bg-[size:40px_40px]"}`}
+            className={`mx-8 h-[80dvh] w-[80dvw] border border-black bg-white ${isDisabled ? "" : "bg-dots-craft bg-[size:40px_40px]"}`}
         >
             <div className="box-border flex w-full justify-start p-5">
                 {items.map((item) => (
                     <ContextMenu key={item.id}>
-                        <ContextMenuTrigger disabled={disabled}>
+                        <ContextMenuTrigger disabled={isDisabled}>
                             <DraggableItem
                                 tableNumber={item.tableNumber}
                                 chairPos={item.chairPos}
                                 key={item.id}
                                 id={item.id}
                                 shape={item.shape}
-                                disabled={disabled}
+                                disabled={isDisabled}
                                 label={item.name}
                                 top={item.y}
                                 left={item.x}
@@ -100,4 +97,4 @@ export function Droppable({ droppableId, disabled, items, handleAmount, editChai
             </div>
         </div>
     );
-}
+});

@@ -1,13 +1,14 @@
-import { LockToggle } from "@/components/lock-toggle";
-import { DraggableItem } from "@/components/draggable-item";
+"use client";
+
+import { LockToggle } from "@/components/dnd-floor/lock-toggle";
+import { DraggableItem } from "@/components/dnd-floor/draggable-item";
 import { ListItems } from "@/utils/list-items";
+import { useCustomDraggable } from "@/context/draggable-provider";
+import { memo } from "react";
 
-type DragNavbarProps = {
-    handleSave: () => Promise<void>;
-    isDisabled: boolean;
-};
+export const DragNavbar = memo(() => {
+    const { handleSave, isDisabled } = useCustomDraggable();
 
-export default function DragNavbar({ handleSave, isDisabled }: DragNavbarProps) {
     return (
         <div className="flex h-screen w-32 flex-col border-l border-l-primary/10 bg-secondary py-2 shadow-lg">
             <LockToggle className="mx-auto" onClick={handleSave} isDisabled={isDisabled} />
@@ -28,4 +29,4 @@ export default function DragNavbar({ handleSave, isDisabled }: DragNavbarProps) 
             </ul>
         </div>
     );
-}
+});

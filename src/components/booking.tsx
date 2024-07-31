@@ -58,8 +58,6 @@ export function Booking({ id }: BookingProps) {
         const newBooking = {
             userId: id,
             date: _date,
-            tel: formData.get("tel") || undefined,
-            firstName: formData.get("firstName") || undefined,
             lastName: formData.get("lastName"),
             email: formData.get("email") || undefined,
             persons: Number(formData.get("persons")),
@@ -80,7 +78,7 @@ export function Booking({ id }: BookingProps) {
             <div className="relative size-80">
                 <div className={`transform-gpu overflow-hidden transition-all ${done ? "blur-sm" : null}`}>
                     <Button
-                        variant="ghost"
+                        variant="link"
                         className="flex"
                         onClick={() => setStep((_step) => (_step > 1 ? _step - 1 : _step))}
                     >

@@ -3,13 +3,12 @@
 import { actionClient } from "@/lib/safe-action";
 import { bookingSchema } from "@/types/bookingSchema";
 import { fetcher } from "@/utils/fetcher";
-import { z } from "zod";
 
 export const postBooking = actionClient.schema(bookingSchema).action(async ({ parsedInput }) => {
-    const res = await fetcher(`${process.env.BACKEND_URL}/booking`, {
+    const res = await fetcher(`${process.env.BACKEND_URL}/bookings/create`, {
         method: "POST",
         data: { booking: parsedInput },
-        zodSchema: z.object({ booking: bookingSchema }),
+        zodSchema: bookingSchema,
     });
     return res;
 });

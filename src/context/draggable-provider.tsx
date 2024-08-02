@@ -50,6 +50,7 @@ export const DraggableProvider = memo(
         const [trash, setTrash] = useState<Item[]>([]);
         const [showTrash, setShowTrash] = useState(false);
         const [isDisabled, setIsDisabled] = useLocalStorage("isEditDisabled", true);
+        const size = { width: 1920 * 0.8, height: 950 * 0.8 };
 
         const mouseSensor = useSensor(MouseSensor, {
             activationConstraint,
@@ -69,38 +70,70 @@ export const DraggableProvider = memo(
                 height: (activatorEvent.target as HTMLElement).offsetHeight,
             };
 
+            let temporaryX = 0;
+            let temporaryY = 0;
+
+            if (activatorEvent instanceof MouseEvent) {
+                temporaryX = ((activatorEvent.clientX - buttonSize.width / 2 - over.rect.left) / size.width) * 100;
+                temporaryY = (((activatorEvent as MouseEvent).clientY - buttonSize.height / 2) / size.height) * 100;
+            }
+            if (activatorEvent instanceof TouchEvent) {
+                temporaryX =
+                    ((activatorEvent.changedTouches[0].clientX - buttonSize.width / 2 - over.rect.left) / size.width) *
+                    100;
+                temporaryY =
+                    (((activatorEvent as TouchEvent).changedTouches[0].clientY - buttonSize.height / 2) / size.height) *
+                    100;
+            }
+
             const handleAxis = (x: number, deltaX: number, y: number, deltaY: number) => {
-                let posX = x + deltaX;
-                let posY = y + deltaY;
-                if (posX > over.rect.right - buttonSize.width) {
-                    posX = over.rect.right - buttonSize.width;
-                    return { x: posX, y };
+                const xpercent = (deltaX / size.width) * 100;
+                const ypercent = (deltaY / size.height) * 100;
+                let posX = Number((x + xpercent).toFixed(50));
+                let posY = Number((y + ypercent).toFixed(50));
+
+                const handleY = (_posY: number) => {
+                    if (_posY > ((over.rect.height - buttonSize.height) / size.height) * 100) {
+                        _posY = ((over.rect.height - buttonSize.height) / size.height) * 100;
+                        return _posY;
+                    }
+                    if (_posY < over.rect.top) {
+                        _posY = over.rect.top;
+                        return _posY;
+                    }
+                    return _posY;
+                };
+
+                if (posX > ((over.rect.width - buttonSize.width) / size.width) * 100) {
+                    posX = ((over.rect.width - buttonSize.width) / size.width) * 100;
+                    return { x: posX, y: handleY(posY) };
                 }
-                if (posX < over.rect.left) {
-                    posX = over.rect.left;
-                    return { x: posX, y };
+                if (posX < 0) {
+                    posX = 0;
+                    return { x: posX, y: handleY(posY) };
                 }
-                if (posY > over.rect.bottom - buttonSize.height) {
-                    posY = over.rect.bottom - buttonSize.height;
-                    return { x, y: posY };
+
+                if (posY > ((over.rect.height - buttonSize.height) / size.height) * 100) {
+                    posY = ((over.rect.height - buttonSize.height) / size.height) * 100;
+                    return { x: posX, y: posY };
                 }
                 if (posY < over.rect.top) {
                     posY = over.rect.top;
-                    return { x, y: posY };
+                    return { x: posX, y: posY };
                 }
 
                 for (const item of items) {
                     const horizChairs = Boolean(item.chairPos.some((pos) => pos === 2 || pos === 3));
                     const vertiChairs = Boolean(item.chairPos.some((pos) => pos === 1 || pos === 4));
-                    const width = horizChairs ? 96 : 48;
-                    const height = vertiChairs ? 96 : 48;
+                    const width = horizChairs ? (96 / size.width) * 100 : (48 / size.width) * 100;
+                    const height = vertiChairs ? (96 / size.height) * 100 : (48 / size.height) * 100;
 
                     if (
                         item.id !== active.id &&
+                        posX + (buttonSize.width / size.width) * 100 > item.x &&
                         posX < item.x + width &&
-                        item.x < posX + buttonSize.width &&
-                        posY < item.y + height &&
-                        item.y < posY + buttonSize.height
+                        posY + (buttonSize.height / size.height) * 100 > item.y &&
+                        posY < item.y + height
                     ) {
                         posX = x;
                         posY = y;
@@ -118,18 +151,8 @@ export const DraggableProvider = memo(
                     userId: session.user.id as string,
                     type: ListItem?.type as Item["type"],
                     name: ListItem?.name as string,
-                    x: handleAxis(
-                        (activatorEvent as MouseEvent).clientX - buttonSize.width / 2,
-                        delta.x,
-                        (activatorEvent as MouseEvent).clientY - buttonSize.height / 2,
-                        delta.y
-                    ).x,
-                    y: handleAxis(
-                        (activatorEvent as MouseEvent).clientX - buttonSize.width / 2,
-                        delta.x,
-                        (activatorEvent as MouseEvent).clientY - buttonSize.height / 2,
-                        delta.y
-                    ).y,
+                    x: handleAxis(temporaryX, delta.x, temporaryY, delta.y).x,
+                    y: handleAxis(temporaryX, delta.x, temporaryY, delta.y).y,
                     shape: ListItem?.shape as Item["shape"],
                     new: true,
                     tableNumber: Math.floor(Math.random() * (100 - 1 + 1) + 1),

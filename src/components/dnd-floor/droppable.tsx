@@ -28,7 +28,7 @@ export const Droppable = memo(({ droppableId }: DroppableProps) => {
     return (
         <div
             ref={setNodeRef}
-            className={`relative h-[calc(950px*0.8)] w-[calc(1920px*0.8)] border border-black bg-white md:mx-auto  ${isDisabled ? "" : "bg-dots-craft bg-[size:40px_40px]"}`}
+            className={`relative h-[calc(950px*0.8)] w-[calc(1280px*0.8)] border border-black bg-white md:mx-auto xl:w-[calc(1920px*0.8)]  ${isDisabled ? "" : "bg-dots-craft bg-[size:40px_40px]"}`}
         >
             <div className="box-border flex w-full justify-start p-5">
                 {items.map((item) => (

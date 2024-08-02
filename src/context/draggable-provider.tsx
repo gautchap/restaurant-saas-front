@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import type { Session } from "next-auth";
 import type { DragEndEvent, DragStartEvent, PointerActivationConstraint } from "@dnd-kit/core";
 
-import { useState, createContext, useContext, memo } from "react";
+import { useState, createContext, useContext, memo, useEffect } from "react";
 import { DndContext, useSensor, MouseSensor, TouchSensor, KeyboardSensor, useSensors } from "@dnd-kit/core";
 import { deleteItems, updateItems } from "@/actions/items";
 import { useLocalStorage } from "@/hooks/use-local-storage";
@@ -30,6 +30,13 @@ type DraggableContextType = {
     items: Item[];
 };
 
+const handleResize = (_window: Window & typeof globalThis) => {
+    if (_window.innerWidth < 1280) {
+        return { width: 1280 * 0.8, height: 950 * 0.8 };
+    }
+    return { width: 1920 * 0.8, height: 950 * 0.8 };
+};
+
 const DraggableContext = createContext<DraggableContextType | undefined>(undefined);
 
 export const useCustomDraggable = () => {
@@ -50,7 +57,10 @@ export const DraggableProvider = memo(
         const [trash, setTrash] = useState<Item[]>([]);
         const [showTrash, setShowTrash] = useState(false);
         const [isDisabled, setIsDisabled] = useLocalStorage("isEditDisabled", true);
-        const size = { width: 1920 * 0.8, height: 950 * 0.8 };
+        // const size = { width: 1920 * 0.8, height: 950 * 0.8 };
+        const [size, setSize] = useState(handleResize(window));
+
+        // const [maxWidth, setMaxWidth] = useState(100);
 
         const mouseSensor = useSensor(MouseSensor, {
             activationConstraint,
@@ -60,6 +70,19 @@ export const DraggableProvider = memo(
         });
         const keyboardSensor = useSensor(KeyboardSensor, {});
         const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
+
+        useEffect(() => {
+            const _handleResize = () => {
+                if (window.innerWidth < 1280) {
+                    return setSize({ width: 1280 * 0.8, height: 950 * 0.8 });
+                }
+                return setSize({ width: 1920 * 0.8, height: 950 * 0.8 });
+
+                // return setSize(handleResize(window));
+            };
+            window.addEventListener("resize", _handleResize);
+            return () => window.removeEventListener("resize", _handleResize);
+        }, []);
 
         const handleDragEnd = async ({ activatorEvent, active, over, delta }: DragEndEvent) => {
             setShowTrash(false);
@@ -104,22 +127,13 @@ export const DraggableProvider = memo(
                     return _posY;
                 };
 
-                if (posX > ((over.rect.width - buttonSize.width) / size.width) * 100) {
+                if (posX + (buttonSize.width / size.width) * 100 > 100) {
                     posX = ((over.rect.width - buttonSize.width) / size.width) * 100;
                     return { x: posX, y: handleY(posY) };
                 }
                 if (posX < 0) {
                     posX = 0;
                     return { x: posX, y: handleY(posY) };
-                }
-
-                if (posY > ((over.rect.height - buttonSize.height) / size.height) * 100) {
-                    posY = ((over.rect.height - buttonSize.height) / size.height) * 100;
-                    return { x: posX, y: posY };
-                }
-                if (posY < over.rect.top) {
-                    posY = over.rect.top;
-                    return { x: posX, y: posY };
                 }
 
                 for (const item of items) {
@@ -140,7 +154,11 @@ export const DraggableProvider = memo(
                     }
                 }
 
-                return { x: posX, y: posY };
+                // console.log(responsiveWidth - buttonWidth - buttonWidth / 2);
+
+                // console.log(posX + (buttonSize.width / size.width) * 100);
+
+                return { x: posX, y: handleY(posY) };
             };
 
             if (Boolean(ListItems.some((item) => item.id === active.id)) && over.id === "drop") {

@@ -10,7 +10,7 @@ export const DragNavbar = memo(() => {
     const { handleSave, isDisabled } = useCustomDraggable();
 
     return (
-        <div className="flex h-screen w-32 flex-col border-l border-l-primary/10 bg-secondary py-2 shadow-lg">
+        <div className="flex h-screen w-32 flex-col border-l border-l-primary/10 bg-secondary py-2 shadow-lg md:flex">
             <LockToggle className="mx-auto" onClick={handleSave} isDisabled={isDisabled} />
             <ul>
                 {ListItems.map((item) => (

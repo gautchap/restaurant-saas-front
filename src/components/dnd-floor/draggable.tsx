@@ -27,7 +27,6 @@ export const Draggable = memo(
         ref
     ) {
         const horizChairs = chairPos.some((pos) => pos === 2 || pos === 3);
-
         const vertiChairs = chairPos.some((pos) => pos === 1 || pos === 4);
 
         return (
@@ -37,7 +36,8 @@ export const Draggable = memo(
                 } flex flex-col items-center justify-center transition-transform ease-in-out`}
                 style={
                     {
-                        ...style,
+                        top: `${style?.top ?? 0}%`,
+                        left: `${style?.left ?? 0}%`,
                         "--translate-x": `${transform?.x ?? 0}px`,
                         "--translate-y": `${transform?.y ?? 0}px`,
                     } as CSSProperties

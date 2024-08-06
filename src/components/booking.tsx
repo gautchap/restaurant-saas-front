@@ -55,9 +55,11 @@ export function Booking({ id }: BookingProps) {
         _date?.setHours(Number(hour?.split(":")[0] as string));
         _date?.setMinutes(Number(hour?.split(":")[1] as string));
 
+        const _dateString = _date?.toISOString();
+
         const newBooking = {
             userId: id,
-            date: _date,
+            date: _dateString,
             lastName: formData.get("lastName"),
             email: formData.get("email") || undefined,
             persons: Number(formData.get("persons")),

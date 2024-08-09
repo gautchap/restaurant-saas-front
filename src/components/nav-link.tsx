@@ -4,6 +4,7 @@ import type { ComponentProps, ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 type NavLinkProps = {
     title: string;
@@ -15,24 +16,25 @@ export default function NavLink({ title, isOpen, children, ...props }: NavLinkPr
     const pathname = usePathname();
 
     return (
-        <li className="my-2 ml-1 max-w-40">
-            <Link
-                {...props}
-                className={cn(
-                    "flex items-center rounded-md transition-colors",
-                    isOpen ? "hover:bg-primary/10" : "",
-                    props.href === pathname ? "bg-primary/10" : ""
-                )}
-            >
-                {children}
-                <p
+        <li className={cn("transition-all transform-gpu duration-300", isOpen ? "translate-x-1" : "translate-x-1")}>
+            <Link {...props} className="inline-flex">
+                <Button
+                    variant="ghost"
                     className={cn(
-                        "transform-gpu text-nowrap transition-all duration-300",
-                        isOpen ? "w-10 opacity-100" : "w-0 opacity-0"
+                        "px-2 hover:bg-primary/10",
+                        String(props.href).split("?")[0] === pathname ? "bg-primary/10" : ""
                     )}
                 >
-                    {title}
-                </p>
+                    {children}
+                    <div
+                        className={cn(
+                            "relative truncate text-nowrap transform-gpu bg-transparent outline-none transition-all duration-300",
+                            isOpen ? "w-24 opacity-100" : "-z-10 w-0 opacity-0"
+                        )}
+                    >
+                        <span>{title}</span>
+                    </div>
+                </Button>
             </Link>
         </li>
     );

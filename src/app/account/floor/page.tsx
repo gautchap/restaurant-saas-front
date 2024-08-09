@@ -12,7 +12,7 @@ const DraggableProvider = dynamic(
         ssr: false,
         loading: () => (
             <div className="flex">
-                <div className="relative h-[calc(950px*0.8)] w-[calc(1920px*0.8)] border border-black bg-white md:mx-auto" />
+                <div className="relative h-[calc(950px*0.8)] w-[calc(1920px*0.8)] border border-primary md:mx-auto" />
                 <div className="flex h-screen w-32 flex-col border-l border-l-primary/10 bg-secondary py-2 shadow-lg" />
             </div>
         ),

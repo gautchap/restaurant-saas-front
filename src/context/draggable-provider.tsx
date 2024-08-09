@@ -154,10 +154,6 @@ export const DraggableProvider = memo(
                     }
                 }
 
-                // console.log(responsiveWidth - buttonWidth - buttonWidth / 2);
-
-                // console.log(posX + (buttonSize.width / size.width) * 100);
-
                 return { x: posX, y: handleY(posY) };
             };
 

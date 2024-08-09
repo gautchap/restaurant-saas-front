@@ -113,7 +113,7 @@ export default function TableContent({ searchParams, from, bookings, userId }: T
     }, [from]);
 
     return (
-        <motion.div className="max-h-[85dvh] overflow-y-auto rounded-md border border-muted-foreground/20">
+        <motion.div className="max-h-[82dvh] overflow-y-auto rounded-md border border-muted-foreground/20 md:max-h-[90dvh]">
             <Table>
                 <TableCaption>
                     {bookings.length === 0 ? (

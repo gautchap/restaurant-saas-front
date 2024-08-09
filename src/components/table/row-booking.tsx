@@ -62,7 +62,9 @@ export default function RowBooking({ booking, edit, newBooking }: RowBookingProp
                 booking.status === "cancelled"
                     ? "after:pointer-events-none after:absolute after:left-0 after:top-1/2 after:block after:h-px after:w-[80%] after:-translate-y-1/2 after:bg-primary"
                     : `${isEdit ? "after:bg-primary" : null}`,
-                booking?.new ? "bg-green-200 hover:bg-green-300" : "hover:bg-muted/50 data-[state=selected]:bg-muted"
+                booking.new
+                    ? "bg-green-400/60 hover:bg-green-400/80 dark:bg-green-700/50 dark:hover:bg-green-700/60"
+                    : "hover:bg-muted/50 data-[state=selected]:bg-muted"
             )}
         >
             <TableCell className={cn("w-72 font-medium", isEdit ? "animate-pulse" : null)}>
@@ -87,9 +89,9 @@ export default function RowBooking({ booking, edit, newBooking }: RowBookingProp
                 {booking.assigned ? (
                     <Badge variant="outline">Table 99</Badge>
                 ) : (
-                    <Badge variant="outline">
+                    <Badge variant="outline" className="bg-background">
                         <LoaderCircle strokeWidth={4} className="mr-2 size-3 animate-spin  text-muted-foreground/50" />
-                        <span>En attente</span>
+                        <span className="truncate whitespace-nowrap">En attente</span>
                     </Badge>
                 )}
             </TableCell>

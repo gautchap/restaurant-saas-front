@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@/lib/auth";
+import { auth, signIn } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { actionClient } from "@/lib/safe-action";
 import { tokenSchema, userSchema, userIdSchema } from "@/types/sessionSchema";
@@ -52,3 +52,7 @@ export async function getUserInfo() {
 
     return session;
 }
+
+export const logIn = actionClient.schema(z.string()).action(async ({ parsedInput }) => {
+    await signIn(parsedInput);
+});

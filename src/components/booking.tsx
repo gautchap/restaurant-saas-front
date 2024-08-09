@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { CalendarCheck, ChevronLeft, CircleX, LoaderCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { postBooking } from "@/actions/booking";
+import { postBookingPublic } from "@/actions/booking";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 type BookingProps = {
@@ -46,27 +46,28 @@ export function Booking({ id }: BookingProps) {
 
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
+        if (!date || !hour) return;
 
         setLoading(true);
         setDone(true);
         const formData = new FormData(event.target as HTMLFormElement);
         const _date = date;
 
-        _date?.setHours(Number(hour?.split(":")[0] as string));
-        _date?.setMinutes(Number(hour?.split(":")[1] as string));
+        _date.setHours(Number(hour?.split(":")[0] as string));
+        _date.setMinutes(Number(hour?.split(":")[1] as string));
 
-        const _dateString = _date?.toISOString();
+        const _dateString = _date.toISOString();
 
         const newBooking = {
             userId: id,
             date: _dateString,
-            lastName: formData.get("lastName"),
-            email: formData.get("email") || undefined,
-            persons: Number(formData.get("persons")),
-            message: formData.get("message") || undefined,
+            lastName: String(formData.get("lastName")) || "",
+            email: String(formData.get("email")) || "",
+            persons: Number(formData.get("persons")) || 1,
+            message: String(formData.get("message")) || undefined,
         };
 
-        const booking = await postBooking(newBooking);
+        const booking = await postBookingPublic(newBooking);
 
         setLoading(false);
 

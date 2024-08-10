@@ -1,21 +1,24 @@
 "use client";
 
 import type { FormEvent, HTMLAttributes } from "react";
-import type { BuiltInProviderType } from "next-auth/providers";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { logIn } from "@/actions/getAuth";
+import { receiveEmail, logIn } from "@/actions/getAuth";
+import { providerMap } from "@/lib/auth";
+import SigninButton from "@/components/signin-button";
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const handleSignIn = async (provider: BuiltInProviderType) => {
+    const providers = providerMap.filter((provider) => provider.id !== "credentials");
+
+    const handleSignIn = async (provider: string) => {
         setIsLoading(true);
         await logIn(provider);
     };
@@ -24,12 +27,13 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         event.preventDefault();
         setIsLoading(true);
         const formData = new FormData(event.target as HTMLFormElement);
-        // console.log(formData.get("email"));
+        const email = formData.get("email");
+        await receiveEmail({ email: email as string, name: "user" });
 
         setTimeout(() => {
             setIsLoading(false);
         }, 3000);
-        return formData.get("email");
+        return email;
     }
 
     return (
@@ -65,14 +69,14 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                     <span className="bg-background px-2 text-muted-foreground">Ou continuer avec</span>
                 </div>
             </div>
-            <Button variant="outline" type="button" disabled={isLoading} onClick={() => handleSignIn("github")}>
-                {isLoading ? (
-                    <Icons.spinner className="mr-2 size-4 animate-spin" />
-                ) : (
-                    <Icons.gitHub className="mr-2 size-4" />
-                )}
-                GitHub
-            </Button>
+            {providers.map((provider) => (
+                <SigninButton
+                    key={provider.id}
+                    isLoading={isLoading}
+                    provider={provider}
+                    onClick={() => handleSignIn(provider.id)}
+                />
+            ))}
         </div>
     );
 }

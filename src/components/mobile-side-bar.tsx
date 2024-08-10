@@ -22,7 +22,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { signOut } from "next-auth/react";
+import { signOutServerSide } from "@/actions/getAuth";
 
 export default function MobileSideBar() {
     const todayFormat = formatDate(new Date());
@@ -78,7 +78,9 @@ export default function MobileSideBar() {
                                         <DropdownMenuItem className="group cursor-pointer p-0 text-red-500 hover:text-red-600">
                                             <button
                                                 className="flex size-full items-center justify-between px-1.5 py-1"
-                                                onClick={() => signOut()}
+                                                onClick={async () => {
+                                                    await signOutServerSide();
+                                                }}
                                             >
                                                 <span className="text-red-500 group-hover:text-red-600">
                                                     Déconnecter

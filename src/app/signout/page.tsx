@@ -1,15 +1,14 @@
 "use client";
 
-import { signOut } from "next-auth/react";
+import { signOutServerSide } from "@/actions/getAuth";
 import { useEffect } from "react";
 
 const SignOut = () => {
     useEffect(() => {
-        async function signOutAsync() {
-            await signOut();
+        (async () => {
+            await signOutServerSide();
             window.location.href = "/login";
-        }
-        signOutAsync();
+        })();
     }, []);
 
     return null;

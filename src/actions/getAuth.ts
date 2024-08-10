@@ -1,6 +1,6 @@
 "use server";
 
-import { auth, signIn } from "@/lib/auth";
+import { auth, signIn, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { actionClient } from "@/lib/safe-action";
 import { tokenSchema, userSchema, userIdSchema, signMailSchema } from "@/types/sessionSchema";
@@ -85,4 +85,6 @@ export async function signOutServerSide() {
             cache: "no-store",
         },
     });
+
+    await signOut();
 }

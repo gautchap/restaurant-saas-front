@@ -90,7 +90,7 @@ export default async function Page({ searchParams }: PageProps) {
 
     return (
         <section>
-            <div className="mb-5 flex max-h-[10dvh] flex-wrap items-center gap-2">
+            <div className="mb-5 flex flex-wrap items-center gap-2">
                 <DatePicker />
                 <Link href="/account/bookings">
                     <Button variant="outline">Reset</Button>

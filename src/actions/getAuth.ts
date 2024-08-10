@@ -3,7 +3,7 @@
 import { auth, signIn } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { actionClient } from "@/lib/safe-action";
-import { tokenSchema, userSchema, userIdSchema } from "@/types/sessionSchema";
+import { tokenSchema, userSchema, userIdSchema, signMailSchema } from "@/types/sessionSchema";
 import { fetcher } from "@/utils/fetcher";
 import { z } from "zod";
 
@@ -23,6 +23,20 @@ export const userExist = actionClient.schema(z.object({ id: userIdSchema })).act
 
 export const getToken = actionClient.schema(userSchema).action(async ({ parsedInput }) => {
     const res = await fetcher(`${process.env.BACKEND_URL}/auth/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        data: parsedInput,
+        customConfig: {
+            cache: "no-store",
+        },
+        zodSchema: tokenSchema,
+    });
+
+    return res;
+});
+
+export const receiveEmail = actionClient.schema(signMailSchema).action(async ({ parsedInput }) => {
+    const res = await fetcher(`${process.env.BACKEND_URL}/auth/send-mail`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         data: parsedInput,
@@ -56,3 +70,19 @@ export async function getUserInfo() {
 export const logIn = actionClient.schema(z.string()).action(async ({ parsedInput }) => {
     await signIn(parsedInput);
 });
+
+export async function signOutServerSide() {
+    const session = await auth();
+    if (!session) return redirect("/login");
+
+    await fetcher(`${process.env.BACKEND_URL}/auth/signout`, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+        },
+        revalidate: "auth-info",
+        customConfig: {
+            cache: "no-store",
+        },
+    });
+}

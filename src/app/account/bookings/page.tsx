@@ -1,10 +1,10 @@
 import { getBookings } from "@/actions/booking";
-import { getUserInfo } from "@/actions/getAuth";
 import CanceledBooking from "@/components/table/canceled-booking";
 import { DatePicker } from "@/components/table/date-picker";
 import TableContent from "@/components/table/table-content";
 import { Button } from "@/components/ui/button";
 import CopyButton from "@/components/ui/copy-button";
+import { auth } from "@/lib/auth";
 import { Booking } from "@/types/bookingSchema";
 import Link from "next/link";
 
@@ -18,9 +18,9 @@ type PageProps = {
 };
 
 export default async function Page({ searchParams }: PageProps) {
-    const user = await getUserInfo();
+    const session = await auth();
 
-    const iframeElement = `<iframe id="reservation" title="reservation restaurant" width="320" height="330" scrolling="no" frameBorder="0" src="${process.env.NEXT_PUBLIC_URL}/export/embed?id=${user?.user.id}"></iframe>`;
+    const iframeElement = `<iframe id="reservation" title="reservation restaurant" width="320" height="330" scrolling="no" frameBorder="0" src="${process.env.NEXT_PUBLIC_URL}/export/embed?id=${session?.user.id}"></iframe>`;
 
     const bookings = await getBookings();
 
@@ -99,7 +99,7 @@ export default async function Page({ searchParams }: PageProps) {
                 <CopyButton element={iframeElement}>Copier le code</CopyButton>
             </div>
             <TableContent
-                userId={user?.user.id || ""}
+                userId={session?.user.id || ""}
                 bookings={handleSearch((bookings as Booking[]) || [])}
                 searchParams={searchParams}
                 from={from}

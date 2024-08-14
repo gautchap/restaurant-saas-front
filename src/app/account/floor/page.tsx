@@ -1,9 +1,9 @@
 import dynamic from "next/dynamic";
 import { getItems } from "@/actions/items";
-import { getUserInfo } from "@/actions/getAuth";
 import { Droppable } from "@/components/dnd-floor/droppable";
 import { DragNavbar } from "@/components/dnd-floor/drag-navbar";
 import { TrashDroppable } from "@/components/dnd-floor/trash-droppable";
+import { auth } from "@/lib/auth";
 
 const DraggableProvider = dynamic(
     // eslint-disable-next-line github/no-then
@@ -21,11 +21,11 @@ const DraggableProvider = dynamic(
 
 export default async function Page() {
     const items = await getItems();
-    const session = await getUserInfo();
+    const session = await auth();
 
     return (
         <div className="overflow-hidden">
-            <DraggableProvider defaultItems={items || []} session={session}>
+            <DraggableProvider defaultItems={items || []} session={session!}>
                 <div className="flex justify-end">
                     <div className="mx-auto w-full flex-1">
                         <Droppable droppableId="drop" />

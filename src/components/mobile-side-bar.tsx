@@ -7,22 +7,14 @@ import {
     SheetFooter,
     SheetHeader,
     SheetTitle,
+    SheetClose,
     SheetTrigger,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Menu, UserRound, Utensils, NotebookText, ArrowRightToLine, Settings } from "lucide-react";
+import { Menu, UserRound, Utensils, NotebookText } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import NavLink from "@/components/nav-link";
 import { formatDate } from "@/lib/format-date";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { signOutServerSide } from "@/actions/getAuth";
+import SideBarFooter from "@/components/side-bar-footer";
 
 export default function MobileSideBar() {
     const todayFormat = formatDate(new Date());
@@ -42,59 +34,29 @@ export default function MobileSideBar() {
                     </SheetHeader>
                     <Separator />
                     <ul className="mt-2 flex-1 space-y-2">
-                        <NavLink title="Mon compte" isOpen={true} href="/account" prefetch={true}>
-                            <UserRound strokeWidth={1.5} className="transition-colors" />
-                        </NavLink>
-                        <NavLink title="Plan de salle" isOpen={true} href="/account/floor" prefetch={true}>
-                            <Utensils strokeWidth={1.5} className="transition-colors" />
-                        </NavLink>
-                        <NavLink
-                            title="Réservations"
-                            isOpen={true}
-                            href={`/account/bookings?from=${todayFormat}`}
-                            prefetch={true}
-                        >
-                            <NotebookText strokeWidth={1.5} className="transition-colors" />
-                        </NavLink>
+                        <SheetClose asChild>
+                            <NavLink title="Mon compte" isOpen={true} href="/account" prefetch={true}>
+                                <UserRound strokeWidth={1.5} className="transition-colors" />
+                            </NavLink>
+                        </SheetClose>
+                        <SheetClose asChild>
+                            <NavLink title="Plan de salle" isOpen={true} href="/account/floor" prefetch={true}>
+                                <Utensils strokeWidth={1.5} className="transition-colors" />
+                            </NavLink>
+                        </SheetClose>
+                        <SheetClose asChild>
+                            <NavLink
+                                title="Réservations"
+                                isOpen={true}
+                                href={`/account/bookings?from=${todayFormat}`}
+                                prefetch={true}
+                            >
+                                <NotebookText strokeWidth={1.5} className="transition-colors" />
+                            </NavLink>
+                        </SheetClose>
                     </ul>
                     <SheetFooter>
-                        <div className="flex items-center justify-between">
-                            <ThemeToggle className="hover:bg-primary/10" />
-                            <div>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="group px-2 hover:bg-primary/10">
-                                            <div className="relative w-16 transform-gpu truncate text-nowrap bg-transparent opacity-100 outline-none transition-all duration-300">
-                                                <span>Options</span>
-                                            </div>
-                                            <Settings
-                                                strokeWidth={1.5}
-                                                className="group-hover:animate-spin group-hover:transition-all group-hover:duration-2500"
-                                            />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem className="group cursor-pointer p-0 text-red-500 hover:text-red-600">
-                                            <button
-                                                className="flex size-full items-center justify-between px-1.5 py-1"
-                                                onClick={async () => {
-                                                    await signOutServerSide();
-                                                }}
-                                            >
-                                                <span className="text-red-500 group-hover:text-red-600">
-                                                    Déconnecter
-                                                </span>
-                                                <ArrowRightToLine
-                                                    className="text-red-500 group-hover:text-red-600"
-                                                    size={15}
-                                                />
-                                            </button>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-                        </div>
+                        <SideBarFooter isOpen={true} />
                     </SheetFooter>
                 </SheetContent>
             </Sheet>

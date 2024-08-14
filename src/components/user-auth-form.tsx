@@ -28,7 +28,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         setIsLoading(true);
         const formData = new FormData(event.target as HTMLFormElement);
         const email = formData.get("email");
-        await receiveEmail({ email: email as string, name: "user" });
+        await receiveEmail({ email: email as string, name: "user", provider: "credentials" });
 
         setTimeout(() => {
             setIsLoading(false);

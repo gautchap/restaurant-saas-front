@@ -1,5 +1,6 @@
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 interface FetcherConfig<T> {
@@ -8,12 +9,13 @@ interface FetcherConfig<T> {
     method?: "DELETE" | "GET" | "OPTIONS" | "PATCH" | "POST" | "PUT";
     headers?: HeadersInit;
     revalidate?: string;
+    customResponse?: NextResponse<unknown>;
     customConfig?: RequestInit;
 }
 
 export async function fetcher<T>(
     url: string,
-    { data, zodSchema, method, headers: customHeaders, revalidate, customConfig }: FetcherConfig<T>
+    { data, zodSchema, method, headers: customHeaders, revalidate, customResponse, customConfig }: FetcherConfig<T>
 ): Promise<T> {
     const config: RequestInit = {
         method: method ?? (data ? "POST" : "GET"),
@@ -28,7 +30,7 @@ export async function fetcher<T>(
 
     // eslint-disable-next-line github/no-then
     return fetch(url, config).then(async (response) => {
-        if (response.status === 401) return redirect("/signout");
+        if (response.status === 401) return customResponse ?? redirect("/signout");
 
         let result = null;
 

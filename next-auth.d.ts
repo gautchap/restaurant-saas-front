@@ -17,11 +17,19 @@ declare module "next-auth" {
 
     interface User {
         accessToken: string;
+        plan: number;
+        customerId: string | null;
+        priceId: string | null;
+        provider: string;
     }
 }
 
 declare module "next-auth/jwt" {
     interface JWT extends NextAuthJWT {
         accessToken: string;
+        plan: number;
+        customerId: string | null;
+        priceId: string | null;
+        provider: string;
     }
 }

@@ -1,5 +1,5 @@
 import type { Provider } from "next-auth/providers";
-import { getToken } from "@/actions/getAuth";
+import { getToken, getUserInfo } from "@/actions/getAuth";
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
@@ -56,12 +56,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (account?.provider) {
                 if (account.provider === "credentials") return true;
 
+                user.provider = account.provider;
+
                 const authInfos = await getToken(user);
 
                 if (!authInfos?.data) return false;
 
                 user.id = authInfos.data.user.id;
                 user.accessToken = authInfos.data.accessToken;
+                user.plan = authInfos.data.user.plan;
+                user.customerId = authInfos.data.user.customerId;
+                user.priceId = authInfos.data.user.priceId;
 
                 return true;
             }
@@ -69,11 +74,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
         async session({ session, token }) {
             session.accessToken = token.accessToken;
+            session.user.provider = token.provider;
+
+            const user = await getUserInfo(token.accessToken);
+
+            session.user.plan = user.plan;
+            session.user.customerId = user.customerId;
+            session.user.priceId = user.priceId;
+
             if (token.sub) session.user.id = token.sub;
             return session;
         },
         async jwt({ token, user }) {
             if (user) {
+                token.plan = user.plan;
+                token.customerId = user.customerId;
+                token.priceId = user.priceId;
+                token.provider = user.provider;
                 token.accessToken = user.accessToken;
             }
             return token;

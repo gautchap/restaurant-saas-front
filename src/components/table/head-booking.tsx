@@ -11,6 +11,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import useQueryParameters from "@/hooks/use-query-parameters";
+import { cn } from "@/lib/utils";
 
 type HeadBookingProps = {
     title: string;
@@ -18,12 +19,13 @@ type HeadBookingProps = {
 } & ThHTMLAttributes<HTMLTableCellElement>;
 
 export default function HeadBooking({ title, children, ...props }: HeadBookingProps) {
-    const { sort, handleSort } = useQueryParameters();
-    const [order, setOrder] = useState(sort === title ? false : true);
+    const { sort, order: orderQuery, handleSort } = useQueryParameters();
 
-    const handleClick = (_order: boolean) => {
+    const [order, setOrder] = useState<"asc" | "desc">(orderQuery as "asc" | "desc");
+
+    const handleClick = (_order: "asc" | "desc") => {
         setOrder(() => _order);
-        handleSort({ _sort: title, _order: _order === false ? "asc" : "desc" });
+        handleSort({ _sort: title, _order });
     };
 
     return (
@@ -34,21 +36,24 @@ export default function HeadBooking({ title, children, ...props }: HeadBookingPr
                         <Button variant="ghost" className="-ml-4 flex items-center">
                             <span>{children}</span>
                             {sort === title ? null : <ChevronsUpDown className="ml-2" size={12} strokeWidth={1.5} />}
-                            {sort === title && order === false ? (
-                                <ArrowUp className="ml-2 text-muted-foreground/70" size={12} />
-                            ) : null}
-                            {sort === title && order === true ? (
-                                <ArrowDown className="ml-2 text-muted-foreground/70" size={12} />
+                            {sort === title ? (
+                                <ArrowUp
+                                    className={cn(
+                                        "transition-transform duration-100 ml-2 text-muted-foreground/70",
+                                        order === "asc" ? "rotate-0" : "-rotate-180"
+                                    )}
+                                    size={12}
+                                />
                             ) : null}
                         </Button>
                     </DropdownMenuTrigger>
                 </TableHead>
                 <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => handleClick(false)}>
+                    <DropdownMenuItem onClick={() => handleClick("asc")}>
                         <ArrowUp className="mr-2 text-muted-foreground/70" size={16} />
                         Asc
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleClick(true)}>
+                    <DropdownMenuItem onClick={() => handleClick("desc")}>
                         <ArrowDown className="mr-2 text-muted-foreground/70" size={16} />
                         Desc
                     </DropdownMenuItem>

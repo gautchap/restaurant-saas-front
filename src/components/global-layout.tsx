@@ -8,7 +8,9 @@ export default function GlobalLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
     return (
         <>
-            {pathname.includes("account") || pathname.includes("login") ? null : <NavBar />}
+            {pathname.includes("account") || pathname.includes("login") || pathname.includes("export") ? null : (
+                <NavBar />
+            )}
             {children}
         </>
     );

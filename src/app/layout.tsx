@@ -5,6 +5,7 @@ import "./globals.css";
 import { auth } from "@/lib/auth";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import GlobalLayout from "@/components/global-layout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,10 +21,10 @@ export default async function RootLayout({
 }>) {
     await auth();
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang="en" className="scroll-smooth" suppressHydrationWarning>
             <body className={inter.className}>
-                <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-                    {children}
+                <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+                    <GlobalLayout>{children}</GlobalLayout>
                     <Toaster position="top-right" richColors />
                 </ThemeProvider>
             </body>

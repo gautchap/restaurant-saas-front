@@ -14,6 +14,7 @@ export async function getBookings() {
         headers: { Authorization: `Bearer ${session?.accessToken}` },
         customConfig: {
             next: { tags: ["bookings"] },
+            cache: "force-cache",
         },
         zodSchema: bookingSchema.array(),
     });

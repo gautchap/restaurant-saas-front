@@ -14,6 +14,7 @@ export async function getItems() {
         headers: { Authorization: `Bearer ${session?.accessToken}` },
         customConfig: {
             next: { tags: ["items"] },
+            cache: "force-cache",
         },
         zodSchema: itemSchema.array(),
     });

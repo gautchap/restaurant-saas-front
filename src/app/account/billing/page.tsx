@@ -1,5 +1,4 @@
 import { getInvoices } from "@/actions/invoices";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     Table,
@@ -11,11 +10,10 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Check, Download, X } from "lucide-react";
+import { Download } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
+import BadgeIcon from "@/components/ui/badge-icon";
 
-const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(amount);
-};
 export default async function BillingPage() {
     const invoices = await getInvoices();
 
@@ -31,6 +29,9 @@ export default async function BillingPage() {
             </TableCaption>
             <TableHeader>
                 <TableRow className="group">
+                    <TableHead title="number" className="max-h-36">
+                        N°
+                    </TableHead>
                     <TableHead title="date">Date</TableHead>
                     <TableHead title="price">Montant TTC</TableHead>
                     <TableHead title="status">Statut</TableHead>
@@ -42,27 +43,14 @@ export default async function BillingPage() {
             <TableBody>
                 {invoices.data.map((invoice) => (
                     <TableRow key={invoice.id}>
+                        <TableCell className="max-w-36">{invoice.number}</TableCell>
                         <TableCell>{new Date(invoice.period_start * 1000).toLocaleDateString("fr-FR")}</TableCell>
                         <TableCell>{formatCurrency(invoice.total / 100)}</TableCell>
                         <TableCell>
                             {invoice.paid ? (
-                                <Badge className="gap-1 bg-green-500 hover:bg-green-500/80">
-                                    <Check
-                                        strokeWidth={4}
-                                        size={12}
-                                        className="rounded-full bg-white p-px text-green-500"
-                                    />
-                                    Payée
-                                </Badge>
+                                <BadgeIcon variant="success">Payée</BadgeIcon>
                             ) : (
-                                <Badge variant="destructive" className="gap-1">
-                                    <X
-                                        strokeWidth={4}
-                                        size={12}
-                                        className="rounded-full bg-white p-px text-destructive"
-                                    />
-                                    Annulée
-                                </Badge>
+                                <BadgeIcon variant="warning">Annulée</BadgeIcon>
                             )}
                         </TableCell>
                         <TableCell className="flex items-center justify-end">
@@ -82,7 +70,7 @@ export default async function BillingPage() {
             </TableBody>
             <TableFooter>
                 <TableRow>
-                    <TableCell colSpan={1}>Total</TableCell>
+                    <TableCell>Total</TableCell>
                     <TableCell>{formatCurrency(totalInvoices / 100)}</TableCell>
                 </TableRow>
             </TableFooter>

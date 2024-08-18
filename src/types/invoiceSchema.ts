@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const invoiceSchema = z.object({
     id: z.string(),
+    number: z.string(),
     total: z.coerce.number(),
     period_start: z.coerce.number(),
     paid: z.boolean(),

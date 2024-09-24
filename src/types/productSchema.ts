@@ -6,3 +6,5 @@ export const productSchema = z.object({
     price: z.number(),
     duration: z.enum(["month", "year"]),
 });
+
+export type Product = z.infer<typeof productSchema>;

@@ -57,7 +57,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 if (account.provider === "credentials") return true;
 
                 user.provider = account.provider;
-
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
                 const authInfos = await getToken(user);
 
                 if (!authInfos?.data) return false;

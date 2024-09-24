@@ -3,7 +3,13 @@ import { Droppable } from "@/components/dnd-floor/droppable";
 import { DragNavbar } from "@/components/dnd-floor/drag-navbar";
 import { TrashDroppable } from "@/components/dnd-floor/trash-droppable";
 import { auth } from "@/lib/auth";
-import { DraggableProvider } from "@/context/draggable-provider";
+import dynamic from "next/dynamic";
+
+const DraggableProvider = dynamic(
+    // eslint-disable-next-line github/no-then
+    () => import("@/context/draggable-provider").then((_module) => _module.DraggableProvider),
+    { ssr: false }
+);
 
 export default async function Page() {
     const items = await getItems();

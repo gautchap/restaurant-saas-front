@@ -10,11 +10,11 @@ export default function Layout({ children }: { children: ReactNode }) {
     return (
         <div
             className={cn(
-                "flex-1",
-                pathName.includes("floor") ? "pl-5" : "overflow-auto container px-4 md:px-8 pt-10 md:pt-7"
+                "flex size-full flex-1 flex-col gap-2 shadow-[0px_0px_15px_-3px_rgb(0_0_0_/_0.1),0px_0px_6px_-4px_rgb(0_0_0_/_0.1)] rounded-tr-2xl lg:rounded-tr-none rounded-tl-2xl  border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900",
+                pathName.includes("floor") ? "pr-32 pt-0" : "md:p-10"
             )}
         >
-            {children}
+            <div className={cn(pathName.includes("floor") ? "" : "overflow-auto container")}>{children}</div>
         </div>
     );
 }

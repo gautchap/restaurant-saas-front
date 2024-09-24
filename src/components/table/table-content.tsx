@@ -151,7 +151,9 @@ export default function TableContent({ searchParams, from, bookings, userId }: T
                 </TableBody>
                 <TableFooter>
                     <TableRow>
-                        <TableCell colSpan={3}>Total</TableCell>
+                        <TableCell colSpan={3}>
+                            <span className="transform-view">Total</span>
+                        </TableCell>
                         <TableCell className="text-right">
                             <b>{totalPersons}</b> couvert{totalPersons > 1 ? "s" : ""}
                         </TableCell>

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { signOutServerSide } from "@/actions/getAuth";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 export default function SideBarFooter({ isOpen }: { isOpen: boolean }) {
     return (

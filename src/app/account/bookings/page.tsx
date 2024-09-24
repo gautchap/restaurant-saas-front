@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import CopyButton from "@/components/ui/copy-button";
 import { auth } from "@/lib/auth";
 import { Booking } from "@/types/bookingSchema";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 type PageProps = {
     searchParams: {

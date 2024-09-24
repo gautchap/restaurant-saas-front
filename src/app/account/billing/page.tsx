@@ -70,7 +70,9 @@ export default async function BillingPage() {
             </TableBody>
             <TableFooter>
                 <TableRow>
-                    <TableCell>Total</TableCell>
+                    <TableCell>
+                        <span className="transform-view">Total</span>
+                    </TableCell>
                     <TableCell>{formatCurrency(totalInvoices / 100)}</TableCell>
                 </TableRow>
             </TableFooter>

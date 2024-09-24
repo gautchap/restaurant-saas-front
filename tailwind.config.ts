@@ -78,6 +78,11 @@ const config = {
                 "accordion-down": "accordion-down 0.2s ease-out",
                 "accordion-up": "accordion-up 0.2s ease-out",
             },
+            transition: {
+                "color-extend":
+                    "color, background-color, border-color, text-decoration-color, fill, stroke box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1)",
+            },
+
             transitionDuration: {
                 "2500": "2500ms",
             },

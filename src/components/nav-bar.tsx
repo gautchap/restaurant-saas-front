@@ -1,6 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import type { Session } from "next-auth";
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { Link } from "next-view-transitions";
 import { cn } from "@/lib/utils";
 import {
     NavigationMenu,
@@ -11,9 +13,10 @@ import {
     NavigationMenuTrigger,
     navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
+import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from "react";
 import { ChevronRight, Chrome } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import MenuMobile from "@/components/menu-mobile";
 
 const components: { title: string; href: string; description: string }[] = [
     {
@@ -50,19 +53,32 @@ const components: { title: string; href: string; description: string }[] = [
     },
 ];
 
-export default function NavBar() {
+export default function NavBar({ session }: { session: Session | null }) {
+    const { scrollY } = useScroll();
+
+    const [scroll, setScroll] = useState(0);
+    useMotionValueEvent(scrollY, "change", (latest) => {
+        setScroll(() => latest);
+    });
+
     return (
-        <header className="mx-auto flex max-w-5xl items-center justify-between py-5">
+        <motion.header
+            className={cn(
+                "fixed inset-x-0 top-4 z-10 mx-3 md:mx-auto flex max-w-5xl items-center justify-between rounded-full transition-color-extend duration-700 px-4 py-1",
+                scroll > 20 ? "bg-accent shadow-lg" : "bg-background"
+            )}
+            initial={{ y: -100 }}
+            animate={{ y: 0 }}
+            transition={{ ease: "circOut" }}
+        >
             <NavigationMenu>
                 <NavigationMenuList>
                     <NavigationMenuItem>
-                        <Link href="/" legacyBehavior passHref>
-                            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                                <Chrome />
-                            </NavigationMenuLink>
+                        <Link href="/" className={`${navigationMenuTriggerStyle()} pl-0`}>
+                            <Chrome />
                         </Link>
                     </NavigationMenuItem>
-                    <NavigationMenuItem>
+                    <NavigationMenuItem className="hidden md:flex">
                         <NavigationMenuTrigger className="cursor-auto">Getting started</NavigationMenuTrigger>
                         <NavigationMenuContent>
                             <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
@@ -92,7 +108,7 @@ export default function NavBar() {
                             </ul>
                         </NavigationMenuContent>
                     </NavigationMenuItem>
-                    <NavigationMenuItem>
+                    <NavigationMenuItem className="hidden md:flex">
                         <NavigationMenuTrigger className="cursor-auto">Components</NavigationMenuTrigger>
                         <NavigationMenuContent>
                             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
@@ -104,21 +120,38 @@ export default function NavBar() {
                             </ul>
                         </NavigationMenuContent>
                     </NavigationMenuItem>
-                    <NavigationMenuItem>
-                        <Link href="#prices" legacyBehavior passHref>
-                            <NavigationMenuLink className={navigationMenuTriggerStyle()}>Tarifs</NavigationMenuLink>
+                    <NavigationMenuItem className="hidden md:flex">
+                        <Link href="/prices" className={`${navigationMenuTriggerStyle()}cursor-pointer`}>
+                            Tarifs
+                        </Link>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem className="hidden md:flex">
+                        <Link href="/test1" className={`${navigationMenuTriggerStyle()}cursor-pointer`}>
+                            test1
+                        </Link>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem className="hidden md:flex">
+                        <Link href="/test2" className={`${navigationMenuTriggerStyle()}cursor-pointer`}>
+                            test2
                         </Link>
                     </NavigationMenuItem>
                 </NavigationMenuList>
             </NavigationMenu>
-
-            <Button asChild className="pr-2">
-                <Link href="/login">
-                    <span>Se connecter</span>
-                    <ChevronRight size={15} />
-                </Link>
+            <Button asChild className="hidden rounded-full pr-2 md:flex">
+                {session ? (
+                    <Link href="/account">
+                        <span>Mon compte</span>
+                        <ChevronRight size={15} />
+                    </Link>
+                ) : (
+                    <Link href="/login">
+                        <span>Se connecter</span>
+                        <ChevronRight size={15} />
+                    </Link>
+                )}
             </Button>
-        </header>
+            <MenuMobile session={session} />
+        </motion.header>
     );
 }
 

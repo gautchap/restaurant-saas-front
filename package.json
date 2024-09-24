@@ -26,16 +26,19 @@
         "clsx": "^2.1.1",
         "date-fns": "^3.6.0",
         "framer-motion": "^11.3.24",
+        "lenis": "^1.1.9",
         "lucide-react": "^0.408.0",
         "nanoid": "^5.0.7",
         "next": "14.2.5",
         "next-auth": "5.0.0-beta.18",
         "next-themes": "^0.3.0",
+        "next-view-transitions": "^0.3.0",
         "react": "^18.3.1",
         "react-day-picker": "^8.10.1",
         "react-dom": "^18.3.1",
         "sonner": "^1.5.0",
-        "tailwind-merge": "^2.4.0"
+        "tailwind-merge": "^2.4.0",
+        "vaul": "^0.9.1"
     },
     "devDependencies": {
         "@types/node": "^20.14.14",
@@ -52,7 +55,7 @@
         "postcss": "^8.4.41",
         "tailwindcss": "^3.4.9",
         "tailwindcss-animate": "^1.0.7",
-        "typescript": "^5.5.4",
+        "typescript": "5.5.4",
         "zod": "^3.23.8"
     }
 }

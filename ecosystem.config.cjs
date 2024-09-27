@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            name: "restaurant-saas-back",
+            name: "restaurant-saas-front",
             script: "server.js",
             instances: "max",
             exec_mode: "cluster",

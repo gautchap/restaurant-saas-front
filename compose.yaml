@@ -1,0 +1,22 @@
+services:
+    server:
+        build:
+            context: .
+        environment:
+            NODE_ENV: production
+            AUTH_SECRET: ${AUTH_SECRET}
+            AUTH_URL: ${AUTH_URL}
+            BACKEND_URL: ${BACKEND_URL}
+            AUTH_GITHUB_ID: ${AUTH_GITHUB_ID}
+            AUTH_GITHUB_SECRET: ${AUTH_GITHUB_SECRET}
+            AUTH_GOOGLE_ID: ${AUTH_GOOGLE_ID}
+            AUTH_GOOGLE_SECRET: ${AUTH_GOOGLE_SECRET}
+            NEXT_PUBLIC_URL: ${NEXT_PUBLIC_URL}
+            AUTH_TRUST_HOST: ${AUTH_TRUST_HOST}
+        ports:
+            - 3000:3000
+        networks:
+            - restaurant-network
+networks:
+    restaurant-network:
+        external: true

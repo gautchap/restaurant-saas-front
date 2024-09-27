@@ -100,10 +100,10 @@ importers:
         version: 0.9.4(@types/react-dom@18.3.0)(@types/react@18.3.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@types/node':
-        specifier: ^20.14.14
+        specifier: ^20.16.6
         version: 20.16.6
       '@types/react':
-        specifier: ^18.3.3
+        specifier: ^18.3.8
         version: 18.3.8
       '@types/react-dom':
         specifier: ^18.3.0

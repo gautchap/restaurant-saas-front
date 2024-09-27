@@ -19,7 +19,7 @@
         "project": "tsconfig.json"
     },
     "plugins": ["@typescript-eslint", "github", "unicorn"],
-    "ignorePatterns": ["src/components/ui/*"],
+    "ignorePatterns": ["src/components/ui/*", "node_modules", "ecosystem.config.cjs", ".next"],
     "rules": {
         "unicorn/filename-case": "off",
         "unicorn/prevent-abbreviations": [

@@ -1,32 +1,22 @@
-# Restaurant Front
+### Building and running your application
 
-An NextJs restaurant management system
+When you're ready, start your application by running:
+`docker compose up --build`.
 
--   Create an account via magic link or google and log in the app
--   Restaurant owner can create a realistic 2D plan of their restaurant with simple drag and drop and set amount of chair per table
--   Restaurant owner can share a link to book to their restaurant
--   Restaurant owner can view all bookings and billings
+Your application will be available at http://localhost:3000.
 
-### Build
+### Deploying your application to the cloud
 
-To build all apps and packages, run the following command:
+First, build your image, e.g.: `docker build -t myapp .`.
+If your cloud uses a different CPU architecture than your development
+machine (e.g., you are on a Mac M1 and your cloud provider is amd64),
+you'll want to build the image for that platform, e.g.:
+`docker build --platform=linux/amd64 -t myapp .`.
 
-```sh
-pnpm build
-```
+Then, push it to your registry, e.g. `docker push myregistry.com/myapp`.
 
-### Develop
+Consult Docker's [getting started](https://docs.docker.com/go/get-started-sharing/)
+docs for more detail on building and pushing.
 
-To develop all apps and packages, run the following command:
-
-```sh
-pnpm dev
-```
-
-### Start
-
-To start all apps and packages, run the following command:
-
-```sh
-pnpm start
-```
+### References
+* [Docker's Node.js guide](https://docs.docker.com/language/nodejs/)

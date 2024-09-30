@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { itemSchema } from "@/types/itemSchema";
 import { fetcher } from "@/utils/fetcher";
 import { actionClient } from "@/lib/safe-action";
+import { revalidateTag } from "next/cache";
 
 export async function getItems() {
     const session = await auth();
@@ -29,8 +30,8 @@ export const updateItems = actionClient.schema(itemSchema.array()).action(async 
         method: "PUT",
         headers: { Authorization: `Bearer ${session?.accessToken}` },
         data: { items: parsedInput },
-        revalidate: "items",
     });
+    revalidateTag("items");
     return res;
 });
 
@@ -42,7 +43,7 @@ export const deleteItems = actionClient.schema(itemSchema.array()).action(async 
         method: "DELETE",
         headers: { Authorization: `Bearer ${session?.accessToken}` },
         data: { items: parsedInput },
-        revalidate: "items",
     });
+    revalidateTag("items");
     return res;
 });

@@ -1,4 +1,3 @@
-import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -15,7 +14,7 @@ interface FetcherConfig<T> {
 
 export async function fetcher<T>(
     url: string,
-    { data, zodSchema, method, headers: customHeaders, revalidate, customResponse, customConfig }: FetcherConfig<T>
+    { data, zodSchema, method, headers: customHeaders, customResponse, customConfig }: FetcherConfig<T>
 ): Promise<T> {
     const config: RequestInit = {
         method: method ?? (data ? "POST" : "GET"),
@@ -36,7 +35,6 @@ export async function fetcher<T>(
 
         try {
             result = await response.json();
-            revalidate ? revalidateTag(revalidate) : null;
         } catch (error: unknown) {
             // eslint-disable-next-line unicorn/no-useless-promise-resolve-reject
             return Promise.reject(error);

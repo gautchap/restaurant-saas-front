@@ -50,7 +50,7 @@ export default function TableContent({ searchParams, from, bookings, userId }: T
 
         let newDate = new Date().toString();
         if (searchParams.from && from) {
-            const _from = new Date("2024-08-29");
+            const _from = new Date(from);
             const thisHour = new Date().getHours();
             _from.setHours(thisHour);
             newDate = _from.toString();
@@ -98,7 +98,7 @@ export default function TableContent({ searchParams, from, bookings, userId }: T
                     new: true,
                 };
 
-                if (from === new Date(booking.date).toLocaleDateString("fr-FR")) {
+                if (from === new Date(booking.date).toLocaleDateString("fr-FR") || !from) {
                     return setTemporaryBookings((_bookings) => [newBooking, ..._bookings]);
                 }
             });

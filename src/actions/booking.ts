@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { actionClient } from "@/lib/safe-action";
 import { bookingSchema } from "@/types/bookingSchema";
 import { fetcher } from "@/utils/fetcher";
+import { revalidateTag } from "next/cache";
 
 export async function getBookings() {
     const session = await auth();
@@ -27,9 +28,8 @@ export const postBookingPublic = actionClient.schema(bookingSchema).action(async
         method: "POST",
         data: { booking: parsedInput },
         zodSchema: bookingSchema,
-        revalidate: "bookings",
     });
-
+    revalidateTag("bookings");
     return res;
 });
 
@@ -42,8 +42,7 @@ export const postBookingPrivate = actionClient.schema(bookingSchema).action(asyn
         headers: { Authorization: `Bearer ${session?.accessToken}` },
         data: { booking: parsedInput },
         zodSchema: bookingSchema,
-        revalidate: "bookings",
     });
-
+    revalidateTag("bookings");
     return res;
 });

@@ -7,7 +7,6 @@ interface FetcherConfig<T> {
     zodSchema?: z.ZodSchema<T>;
     method?: "DELETE" | "GET" | "OPTIONS" | "PATCH" | "POST" | "PUT";
     headers?: HeadersInit;
-    revalidate?: string;
     customResponse?: NextResponse<unknown>;
     customConfig?: RequestInit;
 }

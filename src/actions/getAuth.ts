@@ -7,6 +7,7 @@ import { tokenSchema, userIdSchema, signMailSchema, userSchema } from "@/types/s
 import { fetcher } from "@/utils/fetcher";
 import { z } from "zod";
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 
 export const userExist = actionClient.schema(z.object({ id: userIdSchema })).action(async ({ parsedInput }) => {
     const res = await fetcher(`${process.env.BACKEND_URL}/auth/exist`, {
@@ -76,11 +77,12 @@ export async function signOutServerSide() {
         headers: {
             Authorization: `Bearer ${session?.accessToken}`,
         },
-        revalidate: "auth-info",
+
         customConfig: {
             cache: "no-store",
         },
     });
+    revalidateTag("auth-info");
 
     await signOut();
 }

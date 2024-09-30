@@ -19,7 +19,14 @@
         "project": "tsconfig.json"
     },
     "plugins": ["@typescript-eslint", "github", "unicorn"],
-    "ignorePatterns": ["src/components/ui/*", "node_modules", "ecosystem.config.cjs", ".next"],
+    "ignorePatterns": [
+        "src/components/ui/*",
+        "node_modules",
+        "ecosystem.config.cjs",
+        ".next",
+        "cache-handler.mjs",
+        "next.config.mjs"
+    ],
     "rules": {
         "unicorn/filename-case": "off",
         "unicorn/prevent-abbreviations": [

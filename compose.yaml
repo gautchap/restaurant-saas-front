@@ -1,7 +1,9 @@
 services:
-    server:
+    web:
         build:
             context: .
+        container_name: restaurant-web
+        hostname: restaurant-web
         environment:
             NODE_ENV: production
             AUTH_SECRET: ${AUTH_SECRET}
@@ -13,8 +15,21 @@ services:
             AUTH_GOOGLE_SECRET: ${AUTH_GOOGLE_SECRET}
             NEXT_PUBLIC_URL: ${NEXT_PUBLIC_URL}
             AUTH_TRUST_HOST: ${AUTH_TRUST_HOST}
+            REDIS_URL: ${REDIS_URL}
+            REDIS_AVAILABLE: ${REDIS_AVAILABLE}
+        depends_on:
+            - redis
         ports:
             - 3000:3000
+        networks:
+            - restaurant-network
+    redis:
+        image: redis/redis-stack-server:7.4.0-v0
+        container_name: redis
+        hostname: redis
+        ports:
+            - 6379:6379
+            - 8001:8001
         networks:
             - restaurant-network
 networks:

@@ -30,6 +30,7 @@ CacheHandler.onCreation(async () => {
 
             redisHandler = await createRedisHandler({
                 client,
+                keyPrefix: "neshca:",
                 timeoutMs: 5000,
             });
         } catch (error) {

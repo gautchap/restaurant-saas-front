@@ -4,10 +4,11 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-RUN pnpm add pm2 -g
+RUN pnpm add pm2@latest -g
 
 # Install dependencies only when needed
 FROM base AS deps
+RUN apk update
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./

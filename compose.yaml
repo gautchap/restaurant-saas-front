@@ -5,6 +5,7 @@ services:
         container_name: restaurant-web
         hostname: restaurant-web
         environment:
+            TZ: ${TZ}
             NODE_ENV: production
             AUTH_SECRET: ${AUTH_SECRET}
             AUTH_URL: ${AUTH_URL}

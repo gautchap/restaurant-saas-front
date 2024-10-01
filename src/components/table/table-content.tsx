@@ -88,10 +88,11 @@ export default function TableContent({ searchParams, from, bookings, userId }: T
         });
 
         async function runEvent() {
-            const subscription = transmit.subscription(`user/${userId}/bookings`);
-            await subscription.create();
+            const newBookingSub = transmit.subscription(`user/${userId}/bookings`);
+            const updateBookingSub = transmit.subscription(`user/${userId}/bookings/update`);
+            await Promise.all([newBookingSub.create(), updateBookingSub.create()]);
 
-            subscription.onMessage((data) => {
+            newBookingSub.onMessage((data) => {
                 const streamBooking = transmitSchema.parse(data);
                 const booking = bookingSchema.parse(JSON.parse(streamBooking.booking));
 
@@ -106,6 +107,21 @@ export default function TableContent({ searchParams, from, bookings, userId }: T
 
                 if (from === new Date(booking.date).toLocaleDateString("fr-FR") || !from) {
                     return setTemporaryBookings((_bookings) => [newBooking, ..._bookings]);
+                }
+            });
+
+            updateBookingSub.onMessage((data) => {
+                const streamBooking = transmitSchema.parse(data);
+                const booking = bookingSchema.parse(JSON.parse(streamBooking.booking));
+
+                if (from === new Date(booking.date).toLocaleDateString("fr-FR") || !from) {
+                    return setTemporaryBookings((_bookings) => [
+                        ..._bookings.filter((b) => {
+                            if (booking.status === "cancelled") return b.id !== booking.id;
+                            return b.id !== booking.id;
+                        }),
+                        booking,
+                    ]);
                 }
             });
         }

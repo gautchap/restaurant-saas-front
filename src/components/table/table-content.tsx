@@ -20,6 +20,11 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Transmit } from "@adonisjs/transmit-client";
 import { transmitSchema } from "@/types/transmitSchema";
+import { v4 as uuidv4 } from "uuid";
+// import getConfig from "next/config";
+
+// const { publicRuntimeConfig } = getConfig();
+// const { NODE_ENV } = publicRuntimeConfig;
 
 type TableContentProps = {
     searchParams: {
@@ -78,7 +83,8 @@ export default function TableContent({ searchParams, from, bookings, userId }: T
 
     useEffect(() => {
         const transmit = new Transmit({
-            baseUrl: "http://localhost:3333",
+            baseUrl: `${window.location.protocol}//${window.location.hostname}:3333`,
+            uidGenerator: () => uuidv4(),
         });
 
         async function runEvent() {

@@ -11,6 +11,7 @@ import { deleteItems, updateItems } from "@/actions/items";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { ListItems } from "@/utils/list-items";
 import { Item } from "@/types/itemSchema";
+import { v4 as uuidv4 } from "uuid";
 
 type DraggableProviderProps = {
     activationConstraint?: PointerActivationConstraint;
@@ -57,10 +58,8 @@ export const DraggableProvider = memo(
         const [trash, setTrash] = useState<Item[]>([]);
         const [showTrash, setShowTrash] = useState(false);
         const [isDisabled, setIsDisabled] = useLocalStorage("isEditDisabled", true);
-        // const size = { width: 1920 * 0.8, height: 950 * 0.8 };
-        const [size, setSize] = useState(handleResize(window));
 
-        // const [maxWidth, setMaxWidth] = useState(100);
+        const [size, setSize] = useState(handleResize(window));
 
         const mouseSensor = useSensor(MouseSensor, {
             activationConstraint,
@@ -77,8 +76,6 @@ export const DraggableProvider = memo(
                     return setSize({ width: 1280 * 0.8, height: 950 * 0.8 });
                 }
                 return setSize({ width: 1920 * 0.8, height: 950 * 0.8 });
-
-                // return setSize(handleResize(window));
             };
             window.addEventListener("resize", _handleResize);
             return () => window.removeEventListener("resize", _handleResize);
@@ -161,7 +158,7 @@ export const DraggableProvider = memo(
                 const ListItem = ListItems.find((item) => item.id === active.id);
 
                 const newItem = {
-                    id: window.crypto.randomUUID(),
+                    id: uuidv4(),
                     userId: session.user.id as string,
                     type: ListItem?.type as Item["type"],
                     name: ListItem?.name as string,

@@ -77,8 +77,8 @@ export default function TableContent({ searchParams, from, bookings, userId }: T
     };
 
     useEffect(() => {
-        setTemporaryBookings(() => bookings);
-        setIsNew(() => false);
+        if (JSON.stringify(bookings) !== JSON.stringify(temporaryBookings)) setTemporaryBookings(() => bookings);
+        if (isNew) setIsNew(() => false);
     }, [bookings]);
 
     useEffect(() => {
@@ -115,13 +115,17 @@ export default function TableContent({ searchParams, from, bookings, userId }: T
                 const booking = bookingSchema.parse(JSON.parse(streamBooking.booking));
 
                 if (from === new Date(booking.date).toLocaleDateString("fr-FR") || !from) {
-                    return setTemporaryBookings((_bookings) => [
-                        ..._bookings.filter((b) => {
-                            if (booking.status === "cancelled") return b.id !== booking.id;
-                            return b.id !== booking.id;
-                        }),
-                        booking,
-                    ]);
+                    return setTemporaryBookings((_bookings) => {
+                        const _booking = _bookings.find((b) => b.id === booking.id);
+                        if (booking.status !== "cancelled" && !_booking) return [..._bookings, booking];
+                        if (
+                            (searchParams.canceled === "false" || !searchParams.canceled) &&
+                            booking.status === "cancelled" &&
+                            _booking
+                        )
+                            return _bookings.filter((b) => b.id !== _booking.id);
+                        return _bookings.map((b) => (b.id === booking.id ? booking : b));
+                    });
                 }
             });
         }
@@ -132,10 +136,10 @@ export default function TableContent({ searchParams, from, bookings, userId }: T
         return () => {
             transmit.close();
         };
-    }, [from]);
+    }, [from, searchParams.canceled]);
 
     return (
-        <motion.div className="max-h-[82dvh] overflow-y-auto rounded-md border border-muted-foreground/20 md:max-h-[90dvh]">
+        <motion.div className="max-h-[82dvh] overflow-y-auto rounded-md border border-muted-foreground/20 md:max-h-[88dvh]">
             <Table>
                 <TableCaption>
                     {bookings.length === 0 ? (

@@ -11,7 +11,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { postBookingPrivate } from "@/actions/booking";
 import { motion } from "framer-motion";
 
@@ -27,7 +27,6 @@ export default function RowBooking({ booking, edit, newBooking }: RowBookingProp
     const [isUpdated, setIsUpdated] = useState(false);
 
     const [editInfos, setEditInfos] = useState({ ...booking, hour: new Date(booking.date).getHours() });
-
     const handleEdit = async (mode?: Booking["status"]) => {
         setIsLoading(() => true);
         const formEditInfos = {
@@ -51,6 +50,14 @@ export default function RowBooking({ booking, edit, newBooking }: RowBookingProp
             return;
         }
     };
+
+    useEffect(() => {
+        const previous = { ...editInfos, hour: undefined };
+        delete previous.hour;
+        if (JSON.stringify(previous) !== JSON.stringify(booking)) {
+            setEditInfos({ ...booking, hour: new Date(booking.date).getHours() });
+        }
+    }, [booking]);
 
     return (
         <motion.tr

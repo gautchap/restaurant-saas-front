@@ -11,7 +11,7 @@ export default function ScrollProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         (async () => {
-            if (pathname.includes("export") || pathname.includes("floor") || !userAgent.includes("Windows")) return;
+            if (pathname.includes("account") || !userAgent.includes("Windows")) return;
             const Lenis = (await import("lenis")).default;
             const lenis = new Lenis(options);
 

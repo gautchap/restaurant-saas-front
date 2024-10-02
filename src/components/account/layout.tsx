@@ -14,7 +14,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 pathName.includes("floor") ? "pr-32 pt-0" : "md:p-10"
             )}
         >
-            <div className={cn(pathName.includes("floor") ? "" : "overflow-auto container")}>{children}</div>
+            <div className={cn(pathName.includes("floor") ? "" : "container")}>{children}</div>
         </div>
     );
 }
